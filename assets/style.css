@@ -350,6 +350,10 @@ body {
     margin: 0 auto;
 }
 
+.footer-col {
+    min-width: 0;
+}
+
 .footer-logo {
     font-family: 'Cormorant Garamond', serif;
     font-size: 28px;
@@ -431,4 +435,5 @@ body {
 
 @media (max-width: 500px) {
     .footer-grid { grid-template-columns: 1fr; }
+    .footer-logo { font-size: 24px; letter-spacing: 4px; }
 }
