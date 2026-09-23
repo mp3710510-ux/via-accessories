@@ -435,5 +435,5 @@ body {
 
 @media (max-width: 500px) {
     .footer-grid { grid-template-columns: 1fr; }
-    .footer-logo { font-size: 24px; letter-spacing: 4px; }
+    .footer-logo { font-size: 24px; letter-spacing: 3px; }
 }
