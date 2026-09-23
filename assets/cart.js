@@ -8,7 +8,7 @@
    ============================================================ */
 
 var CART_KEY = 'mystore_cart';
-var TG_NICK = 'alinaandyyy';
+var TG_NICK = '-';
 
 function getCart() {
     try {
