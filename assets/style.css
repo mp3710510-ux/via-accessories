@@ -1,0 +1,434 @@
+/* ============================================================
+   ОБЩИЕ СТИЛИ — index.html, catalog.html, product.html
+   Раньше эти правила были скопированы в каждый файл. Теперь
+   меняем один раз здесь, и изменения применяются везде.
+   Стили, уникальные для конкретной страницы (hero-слайдер,
+   сетка каталога, галерея товара и т.п.) остаются в <style>
+   внутри самой страницы.
+   ============================================================ */
+
+:root {
+    --color-ink: #1c1a17;        /* основной тёмный (шапка, кнопки) */
+    --color-ink-deep: #131110;   /* чуть глубже, для hover-состояний тёмных элементов */
+    --color-cream: #f5f1ea;      /* светлый текст на тёмном фоне */
+    --color-muted: #6b6258;      /* приглушённый текст */
+    --color-gold: #a9814a;       /* основной акцент — насыщенное золото (было бледнее) */
+    --color-gold-soft: var(--color-gold);  /* мягкое золото — для крупных заливок, где темнее было бы тяжело */
+    --color-wine: #5c2430;       /* второй акцент — глубокий бордовый, для редких точечных выделений */
+    --color-wine-soft: #7a3341;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Montserrat', Arial, sans-serif;
+    color: #1a1a1a;
+    -webkit-font-smoothing: antialiased;
+    background: linear-gradient(180deg, #faf7f2 0%, #f5efe4 20%, #f0e9dd 40%, #ebe2d2 60%, #e6dcc9 80%, #e8e0d3 100%);
+    background-attachment: fixed;
+    background-size: cover;
+    min-height: 100vh;
+}
+
+/* ===== ШАПКА ===== */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 40px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: #1c1a17;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.topbar-left, .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    flex: 1;
+}
+
+.topbar-right { justify-content: flex-end; }
+
+.topbar a {
+    color: #f5f1ea;
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.3s;
+}
+
+.topbar a:hover { color: var(--color-gold); }
+
+.nav-item {
+    position: relative;
+    display: inline-block;
+    padding: 8px 0;
+    cursor: pointer;
+    color: #f5f1ea;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.3s;
+    user-select: none;
+}
+
+.nav-item:hover { color: var(--color-gold); }
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #1c1a17;
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 22px 30px;
+    min-width: 220px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+    z-index: 300;
+}
+
+.nav-item:hover .dropdown,
+.nav-item.open .dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown a {
+    display: block;
+    padding: 10px 0;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #f5f1ea;
+    text-decoration: none;
+    transition: color 0.2s, padding-left 0.2s;
+    white-space: nowrap;
+}
+
+.dropdown a:hover {
+    color: var(--color-gold);
+    padding-left: 6px;
+}
+
+.logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    color: #f5f1ea;
+    text-decoration: none;
+}
+
+.icon {
+    font-size: 16px;
+    cursor: pointer;
+    color: #f5f1ea;
+    position: relative;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    user-select: none;
+    transition: color 0.3s;
+}
+
+.icon:hover { color: var(--color-gold); }
+
+/* ===== КОРЗИНА ===== */
+.cart-wrapper { position: relative; }
+
+.cart-count {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    background: var(--color-gold);
+    color: #1c1a17;
+    font-size: 10px;
+    font-weight: 600;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    letter-spacing: 0;
+}
+
+.cart-count.show { display: inline-flex; }
+
+.cart-panel {
+    position: absolute;
+    top: 44px;
+    right: 0;
+    width: 340px;
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.18);
+    padding: 24px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+    z-index: 500;
+    color: #1a1a1a;
+}
+
+.cart-panel.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.cart-panel h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #1c1a17;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+}
+
+.cart-empty {
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: #6b6258;
+    padding: 20px 0;
+    text-align: center;
+}
+
+.cart-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    align-items: center;
+}
+
+.cart-item-img {
+    width: 52px;
+    height: 60px;
+    object-fit: cover;
+    background: #f5f5f5;
+    flex-shrink: 0;
+}
+
+.cart-item-info { flex: 1; min-width: 0; }
+
+.cart-item-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #1a1a1a;
+    margin-bottom: 4px;
+}
+
+.cart-item-price {
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: #6b6258;
+}
+
+.cart-item-remove {
+    background: none;
+    border: none;
+    color: #6b6258;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px 8px;
+    transition: color 0.2s;
+}
+
+.cart-item-remove:hover { color: #c0392b; }
+
+.cart-footer {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: #1c1a17;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+}
+
+.cart-checkout {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: #1c1a17;
+    color: #f5f1ea;
+    text-align: center;
+    text-decoration: none;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    transition: background 0.3s;
+    cursor: pointer;
+    border: none;
+}
+
+.cart-checkout:hover { background: var(--color-gold); color: #1c1a17; }
+
+.cart-clear {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    background: none;
+    border: none;
+    color: #6b6258;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.cart-clear:hover { color: #c0392b; }
+
+/* Кнопка "В корзину" на карточках товара */
+.add-to-cart {
+    display: block;
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px;
+    background: none;
+    border: 1px solid #1c1a17;
+    color: #1c1a17;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.add-to-cart:hover {
+    background: #1c1a17;
+    color: #f5f1ea;
+}
+
+.add-to-cart.added {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+    color: #1c1a17;
+}
+
+/* ===== ФУТЕР ===== */
+.footer {
+    background: #f5f1ea;
+    padding: 70px 60px 40px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr 1.2fr;
+    gap: 40px;
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+.footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    color: #1c1a17;
+}
+
+.footer-col h4 {
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #1c1a17;
+    margin-bottom: 22px;
+}
+
+.footer-col ul { list-style: none; }
+.footer-col li { margin-bottom: 12px; }
+
+.footer-col a {
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: #6b6258;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.footer-col a:hover { color: #1c1a17; }
+
+.footer-phone, .footer-email {
+    font-family: 'Cormorant Garamond', serif;
+    color: #1c1a17;
+    text-decoration: none;
+    border-bottom: 1px solid #1c1a17;
+    padding-bottom: 4px;
+    display: inline-block;
+}
+
+.footer-phone { font-size: 22px; margin-bottom: 28px; }
+.footer-email { font-size: 20px; margin-bottom: 32px; }
+
+.footer-cta {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #1c1a17;
+    text-decoration: none;
+    border-bottom: 1px solid #1c1a17;
+    padding-bottom: 4px;
+    display: inline-block;
+}
+
+.footer-bottom {
+    max-width: 1500px;
+    margin: 60px auto 0;
+    padding-top: 30px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #6b6258;
+}
+
+@media (max-width: 900px) {
+    .topbar { padding: 16px 16px; }
+    .topbar-left, .topbar-right { gap: 14px; }
+    .topbar-left > a { display: none; }
+    .topbar-right a:not(.icon) { display: none; }
+    .logo { font-size: 16px; letter-spacing: 4px; }
+    .nav-item { font-size: 11px; }
+    .dropdown { padding: 16px 20px; min-width: 180px; left: -20px; }
+    .footer { padding: 50px 25px 30px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 30px; }
+    .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
+}
+
+@media (max-width: 500px) {
+    .footer-grid { grid-template-columns: 1fr; }
+}

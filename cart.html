@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Кошик — via.accessories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+/* ===== Стили только для страницы корзины ===== */
+.cart-page-header{max-width:900px;margin:0 auto;padding:60px 40px 30px;text-align:center}
+.cart-page-header h1{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:400;letter-spacing:8px;text-transform:uppercase;color:#1c1a17}
+.cart-page-wrap{max-width:900px;margin:0 auto;padding:0 40px 100px}
+
+.cart-page-empty{text-align:center;padding:60px 20px;color:#6b6258}
+.cart-page-empty p{font-size:15px;margin-bottom:26px}
+.cart-page-empty a{display:inline-block;padding:14px 34px;border:1px solid #1c1a17;color:#1c1a17;text-decoration:none;font-size:12px;letter-spacing:3px;text-transform:uppercase;transition:all 0.3s}
+.cart-page-empty a:hover{background:#1c1a17;color:#f5f1ea}
+
+.cart-page-item{display:flex;align-items:center;gap:20px;padding:20px 0;border-bottom:1px solid rgba(0,0,0,0.08)}
+.cart-page-item-link{display:flex;align-items:center;gap:20px;flex:1;min-width:0;text-decoration:none;color:inherit}
+.cart-page-item-img{width:80px;height:96px;object-fit:cover;background:#f0ebe1;border-radius:2px;flex-shrink:0}
+.cart-page-item-info{min-width:0}
+.cart-page-item-name{font-family:'Cormorant Garamond',serif;font-size:20px;letter-spacing:2px;text-transform:uppercase;color:#1a1a1a;margin-bottom:8px}
+.cart-page-item-price{font-size:13px;letter-spacing:1px;color:#6b6258}
+.cart-page-item-remove{background:none;border:none;color:#a89c89;cursor:pointer;font-size:20px;padding:10px;flex-shrink:0;transition:color 0.2s}
+.cart-page-item-remove:hover{color:#c0392b}
+
+.cart-page-footer{margin-top:30px;padding-top:30px;border-top:1px solid rgba(0,0,0,0.1)}
+.cart-page-total{display:flex;justify-content:space-between;align-items:baseline;font-family:'Cormorant Garamond',serif;font-size:24px;letter-spacing:1px;color:#1c1a17;text-transform:uppercase;margin-bottom:24px}
+.cart-page-total span:last-child{color:var(--color-gold);font-weight:500}
+.cart-page-actions{display:flex;flex-direction:column;gap:12px}
+
+@media (max-width:600px){
+    .cart-page-header{padding:40px 20px 20px}
+    .cart-page-wrap{padding:0 20px 70px}
+    .cart-page-item{gap:14px;padding:16px 0}
+    .cart-page-item-link{gap:14px}
+    .cart-page-item-img{width:64px;height:78px}
+    .cart-page-item-name{font-size:16px}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+<div class="topbar-left">
+<a href="index.html">Головна</a>
+<div class="nav-item">
+Каталог
+<div class="dropdown">
+<a href="catalog.html?dept=bags">Сумки</a>
+<a href="catalog.html?dept=shoes">Взуття</a>
+<a href="catalog.html?dept=watches">Годинники</a>
+<a href="catalog.html?dept=jewelry">Прикраси</a>
+<a href="catalog.html?dept=accessories">Аксесуари</a>
+<a href="catalog.html?dept=eyewear">Окуляри</a>
+</div>
+</div>
+</div>
+<a href="index.html" class="logo">via.accessories</a>
+<div class="topbar-right">
+<a href="index.html#contacts">Контакти</a>
+<div class="cart-wrapper">
+<a href="cart.html" class="icon" title="Кошик">🛒<span class="cart-count" id="cartCount">0</span></a>
+</div>
+</div>
+</header>
+
+<div class="cart-page-header">
+<h1>Кошик</h1>
+</div>
+
+<div class="cart-page-wrap">
+<div id="cartPageEmpty" class="cart-page-empty" style="display:none;">
+<p>Кошик порожній</p>
+<a href="catalog.html">Перейти до каталогу</a>
+</div>
+
+<div id="cartPageItems"></div>
+
+<div class="cart-page-footer" id="cartPageFooter" style="display:none;">
+<div class="cart-page-total">
+<span>Разом</span>
+<span id="cartPageTotal">0 грн</span>
+</div>
+<div class="cart-page-actions">
+<a href="#" class="cart-checkout" id="cartCheckout">Оформити замовлення в Telegram</a>
+<button class="cart-clear" id="cartClear" type="button">Очистити кошик</button>
+</div>
+</div>
+</div>
+
+<footer class="footer">
+<div class="footer-grid">
+<div class="footer-col"><div class="footer-logo">via.accessories</div></div>
+<div class="footer-col">
+<h4>Відділи</h4>
+<ul>
+<li><a href="catalog.html?dept=bags">Сумки</a></li>
+<li><a href="catalog.html?dept=shoes">Взуття</a></li>
+<li><a href="catalog.html?dept=watches">Годинники</a></li>
+<li><a href="catalog.html?dept=jewelry">Прикраси</a></li>
+<li><a href="catalog.html?dept=accessories">Аксесуари</a></li>
+<li><a href="catalog.html?dept=eyewear">Окуляри</a></li>
+</ul>
+</div>
+<div class="footer-col">
+<h4>Бренди</h4>
+<ul>
+<li><a href="catalog.html?brand=Chanel">Chanel</a></li>
+<li><a href="catalog.html?brand=Louis%20Vuitton">Louis Vuitton</a></li>
+<li><a href="catalog.html?brand=Herm%C3%A8s">Hermès</a></li>
+<li><a href="catalog.html?brand=Rolex">Rolex</a></li>
+<li><a href="catalog.html?brand=Dior">Dior</a></li>
+<li><a href="catalog.html">Всі бренди</a></li>
+</ul>
+</div>
+<div class="footer-col">
+<h4>Про нас</h4>
+<ul>
+<li><a href="index.html#about">Про магазин</a></li>
+<li><a href="#">Доставка</a></li>
+</ul>
+</div>
+<div class="footer-col">
+<h4>Звʼяжіться з нами</h4>
+<a href="tel:+380987457294" class="footer-phone">+38 098 745 72 94</a>
+<br><br>
+<a href="https://t.me/alinaandyyy" target="_blank" rel="noopener" class="footer-cta">Написати в Telegram</a>
+</div>
+</div>
+<div class="footer-bottom">
+<div>© 2026 via.accessories · Premium Selection</div>
+</div>
+</footer>
+
+<!-- Корзина общая для всех страниц: assets/cart.js -->
+<script src="assets/nav.js"></script>
+<script src="assets/cart.js"></script>
+
+</body>
+</html>

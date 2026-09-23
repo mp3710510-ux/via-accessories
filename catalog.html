@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Каталог — via.accessories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+/* ===== Стили только для страницы каталога ===== */
+.page-header{max-width:1600px;margin:0 auto;padding:70px 40px 40px;text-align:center}
+.page-header .breadcrumb{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#6b6258;margin-bottom:20px}
+.page-header .breadcrumb a{color:#6b6258;text-decoration:none;transition:color 0.3s}
+.page-header .breadcrumb a:hover{color:var(--color-gold)}
+.page-header h1{font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:400;letter-spacing:12px;text-transform:uppercase;color:#1c1a17}
+.page-header .subtitle{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#6b6258;margin-top:18px}
+.grid-wrapper{max-width:1600px;margin:0 auto;padding:20px 40px 80px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px 28px}
+.card{display:flex;flex-direction:column;min-width:0;text-decoration:none;color:#1a1a1a;overflow:hidden;transition:opacity 0.3s}
+.card:hover{opacity:0.92}
+.card-image{width:100%;aspect-ratio:1/1.15;overflow:hidden;background:#f5f5f5}
+.card-image img{width:100%;height:100%;object-fit:cover;transition:transform 1s ease}
+.card:hover .card-image img{transform:scale(1.05)}
+.card-caption{display:flex;flex-direction:column;flex:1;text-align:center;padding:22px 16px 20px}
+.card-caption .name{font-family:'Cormorant Garamond',serif;font-size:19px;letter-spacing:0.3px;color:#1a1a1a;margin-bottom:8px;min-height:2.6em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.card-caption .price{font-size:16px;font-weight:500;letter-spacing:0.3px;color:#1c1a17}
+.card-caption .code{font-size:11px;letter-spacing:1px;color:#a89c89;margin-top:6px}
+.card-caption .add-to-cart{margin-top:auto;padding-top:14px}
+.brand-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.brand-tile{display:block;text-decoration:none;color:#1a1a1a;overflow:hidden;transition:opacity 0.3s}
+.brand-tile:hover{opacity:0.85}
+.brand-tile-image{width:100%;aspect-ratio:1/1;overflow:hidden;background:#f0ebe1;display:flex;align-items:center;justify-content:center}
+.brand-tile-image img{width:100%;height:100%;object-fit:cover;transition:transform 1s ease}
+.brand-tile:hover .brand-tile-image img{transform:scale(1.05)}
+.brand-tile-name{text-align:center;padding:20px 16px 0;font-family:'Cormorant Garamond',serif;font-size:18px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a}
+.catalog-empty{text-align:center;padding:60px 20px;color:#6b6258}
+.catalog-empty p{font-size:15px;margin-bottom:26px}
+.catalog-empty a{display:inline-block;padding:14px 34px;border:1px solid #1c1a17;color:#1c1a17;text-decoration:none;font-size:12px;letter-spacing:3px;text-transform:uppercase;transition:all 0.3s}
+.catalog-empty a:hover{background:#1c1a17;color:#f5f1ea}
+@media (max-width:900px){.brand-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:500px){.brand-grid{grid-template-columns:1fr}}
+@media (max-width:900px){.page-header{padding:50px 20px 30px}.page-header h1{font-size:30px;letter-spacing:8px}.grid-wrapper{padding:20px}.grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:500px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="topbar">
+<div class="topbar-left">
+<a href="index.html">Головна</a>
+<div class="nav-item">
+Каталог
+<div class="dropdown">
+<a href="catalog.html?dept=bags">Сумки</a>
+<a href="catalog.html?dept=shoes">Взуття</a>
+<a href="catalog.html?dept=watches">Годинники</a>
+<a href="catalog.html?dept=jewelry">Прикраси</a>
+<a href="catalog.html?dept=accessories">Аксесуари</a>
+<a href="catalog.html?dept=eyewear">Окуляри</a>
+</div>
+</div>
+</div>
+<a href="index.html" class="logo">via.accessories</a>
+<div class="topbar-right">
+<a href="index.html#contacts">Контакти</a>
+<div class="cart-wrapper">
+<a href="cart.html" class="icon" title="Кошик">🛒<span class="cart-count" id="cartCount">0</span></a>
+</div>
+</div>
+</header>
+
+<div class="page-header">
+<div class="breadcrumb" id="breadcrumb"><a href="index.html">Головна</a></div>
+<h1 id="pageTitle">Каталог</h1>
+<div class="subtitle" id="pageSubtitle">Всі товари магазину</div>
+</div>
+
+<div class="grid-wrapper" id="gridWrapper"></div>
+
+<footer class="footer">
+<div class="footer-grid">
+<div class="footer-col"><div class="footer-logo">via.accessories</div></div>
+<div class="footer-col">
+<h4>Відділи</h4>
+<ul>
+<li><a href="catalog.html?dept=bags">Сумки</a></li>
+<li><a href="catalog.html?dept=shoes">Взуття</a></li>
+<li><a href="catalog.html?dept=watches">Годинники</a></li>
+<li><a href="catalog.html?dept=jewelry">Прикраси</a></li>
+<li><a href="catalog.html?dept=accessories">Аксесуари</a></li>
+<li><a href="catalog.html?dept=eyewear">Окуляри</a></li>
+</ul>
+</div>
+<div class="footer-col">
+<h4>Бренди</h4>
+<ul>
+<li><a href="catalog.html?brand=Chanel">Chanel</a></li>
+<li><a href="catalog.html?brand=Louis%20Vuitton">Louis Vuitton</a></li>
+<li><a href="catalog.html?brand=Herm%C3%A8s">Hermès</a></li>
+<li><a href="catalog.html?brand=Rolex">Rolex</a></li>
+<li><a href="catalog.html?brand=Dior">Dior</a></li>
+<li><a href="catalog.html">Всі бренди</a></li>
+</ul>
+</div>
+<div class="footer-col">
+<h4>Про нас</h4>
+<ul>
+<li><a href="index.html#about">Про магазин</a></li>
+<li><a href="#">Доставка</a></li>
+</ul>
+</div>
+<div class="footer-col">
+<h4>Звʼяжіться з нами</h4>
+<a href="tel:+380987457294" class="footer-phone">+38 098 745 72 94</a>
+<br><br>
+<a href="https://t.me/alinaandyyy" target="_blank" rel="noopener" class="footer-cta">Написати в Telegram</a>
+</div>
+</div>
+<div class="footer-bottom">
+<div>© 2026 via.accessories · Premium Selection</div>
+</div>
+</footer>
+
+<!-- Единый список товаров -->
+<script src="assets/products.js"></script>
+
+<script>
+function escapeHtml(str) {
+    var div = document.createElement('div');
+    div.textContent = String(str);
+    return div.innerHTML;
+}
+
+function makeCard(item) {
+    var card = document.createElement('div');
+    card.className = 'card';
+    var cover = item.images && item.images.length ? item.images[0] : '';
+    var codeHtml = item.code ? '<div class="code">' + item.code + '</div>' : '';
+    card.innerHTML = '<a href="product.html?id=' + encodeURIComponent(item.id) + '" style="display:block;text-decoration:none;color:inherit;"><div class="card-image"><img src="' + cover + '" alt="' + item.name + '"></div></a><div class="card-caption"><a href="product.html?id=' + encodeURIComponent(item.id) + '" style="text-decoration:none;color:inherit;"><div class="name">' + item.name + '</div><div class="price">' + item.price + '</div>' + codeHtml + '</a><button class="add-to-cart" type="button">У кошик</button></div>';
+    var btn = card.querySelector('.add-to-cart');
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        addToCart({ id: item.id, name: item.name, price: item.price, code: item.code, priceNum: parseInt(item.price.replace(/[^0-9]/g, '')) || 0, img: cover });
+        btn.classList.add('added');
+        btn.textContent = '✓ Додано';
+        setTimeout(function() { btn.classList.remove('added'); btn.textContent = 'У кошик'; }, 1200);
+    });
+    return card;
+}
+
+function makeBrandTile(deptKey, brandInfo) {
+    var a = document.createElement('a');
+    a.className = 'brand-tile';
+    var url = 'catalog.html?brand=' + encodeURIComponent(brandInfo.brand) + (deptKey ? '&dept=' + encodeURIComponent(deptKey) : '');
+    a.href = url;
+    a.innerHTML = '<div class="brand-tile-image"><img src="' + brandInfo.cover + '" alt="' + brandInfo.brand + '"></div><div class="brand-tile-name">' + brandInfo.brand + '</div>';
+    return a;
+}
+
+function renderGrid(items) {
+    var wrap = document.getElementById('gridWrapper');
+    var grid = document.createElement('div');
+    grid.className = 'grid';
+    grid.id = 'catalogGrid';
+    items.forEach(function(item) { grid.appendChild(makeCard(item)); });
+    wrap.innerHTML = '';
+    wrap.appendChild(grid);
+}
+
+function renderBrandGrid(deptKey, brands) {
+    var wrap = document.getElementById('gridWrapper');
+    var grid = document.createElement('div');
+    grid.className = 'brand-grid';
+    brands.forEach(function(b) { grid.appendChild(makeBrandTile(deptKey, b)); });
+    wrap.innerHTML = '';
+    wrap.appendChild(grid);
+}
+
+function renderEmpty(message, linkText, linkHref) {
+    var wrap = document.getElementById('gridWrapper');
+    wrap.innerHTML = '<div class="catalog-empty"><p>' + escapeHtml(message) + '</p><a href="' + linkHref + '">' + escapeHtml(linkText) + '</a></div>';
+}
+
+function setBreadcrumb(parts) {
+    // parts: [{text, href}] — последний элемент без href считается текущей страницей
+    var el = document.getElementById('breadcrumb');
+    var html = '<a href="index.html">Головна</a>';
+    parts.forEach(function(p) {
+        html += ' / ' + (p.href ? ('<a href="' + p.href + '">' + escapeHtml(p.text) + '</a>') : escapeHtml(p.text));
+    });
+    el.innerHTML = html;
+}
+
+var params = new URLSearchParams(window.location.search);
+var deptKey = params.get('dept');
+var brandName = params.get('brand');
+var deptMeta = deptKey ? DEPARTMENTS_META[deptKey] : null;
+var titleEl = document.getElementById('pageTitle');
+var subtitleEl = document.getElementById('pageSubtitle');
+
+if (deptMeta && brandName) {
+    /* Каталог -> Відділ -> Бренд -> товари цього бренду в цьому відділі */
+    titleEl.textContent = brandName;
+    subtitleEl.textContent = deptMeta.title;
+    document.title = brandName + ' — ' + deptMeta.title + ' — via.accessories';
+    setBreadcrumb([{ text: deptMeta.title, href: 'catalog.html?dept=' + encodeURIComponent(deptKey) }, { text: brandName }]);
+    var items1 = getProductsByBrand(brandName, deptKey);
+    if (items1.length) {
+        renderGrid(items1);
+    } else {
+        renderEmpty('У цьому відділі поки немає товарів бренду ' + brandName + '.', 'Усі товари відділу «' + deptMeta.title + '»', 'catalog.html?dept=' + encodeURIComponent(deptKey));
+    }
+
+} else if (deptMeta) {
+    /* Каталог -> Відділ -> плитки брендів (або одразу товари, якщо бренд один) */
+    titleEl.textContent = deptMeta.title;
+    subtitleEl.textContent = deptMeta.subtitle;
+    document.title = deptMeta.title + ' — via.accessories';
+    setBreadcrumb([{ text: deptMeta.title }]);
+    var brands = getBrandsByDept(deptKey);
+    if (brands.length > 1) {
+        renderBrandGrid(deptKey, brands);
+    } else if (brands.length === 1) {
+        renderGrid(getProductsByDept(deptKey));
+    } else {
+        renderEmpty('У розділі «' + deptMeta.title + '» поки немає товарів. Зазирніть трохи пізніше.', 'Перейти в каталог', 'catalog.html');
+    }
+
+} else if (brandName) {
+    /* Посилання з футера "Бренди" — товари бренду з усіх відділів */
+    titleEl.textContent = brandName;
+    subtitleEl.textContent = "Усі товари бренду";
+    document.title = brandName + ' — via.accessories';
+    setBreadcrumb([{ text: brandName }]);
+    var items2 = getProductsByBrand(brandName);
+    if (items2.length) {
+        renderGrid(items2);
+    } else {
+        renderEmpty('Товари бренду ' + brandName + ' скоро з’являться.', 'Перейти в каталог', 'catalog.html');
+    }
+
+} else {
+    /* Увесь каталог без фільтрів */
+    titleEl.textContent = "Каталог";
+    subtitleEl.textContent = "Всі товари магазину";
+    document.title = 'Каталог — via.accessories';
+    setBreadcrumb([{ text: 'Каталог' }]);
+    renderGrid(getAllProducts());
+}
+</script>
+
+<!-- Корзина теперь общая для всех страниц: assets/cart.js -->
+<script src="assets/nav.js"></script>
+<script src="assets/cart.js"></script>
+
+</body>
+</html>
