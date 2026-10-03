@@ -350,10 +350,6 @@ body {
     margin: 0 auto;
 }
 
-.footer-col {
-    min-width: 0;
-}
-
 .footer-logo {
     font-family: 'Cormorant Garamond', serif;
     font-size: 28px;
@@ -430,7 +426,14 @@ body {
     .dropdown { padding: 16px 20px; min-width: 180px; left: -20px; }
     .footer { padding: 50px 25px 30px; }
     .footer-grid { grid-template-columns: 1fr 1fr; gap: 30px; }
+    .footer-col { min-width: 0; }
+    .footer-grid > .footer-col:first-child { grid-column: 1 / -1; }
     .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
+}
+
+/* 901–960px: колонок ще 5, а логотип 383px розпирає першу колонку й дає горизонтальний скрол */
+@media (min-width: 901px) and (max-width: 960px) {
+    .footer-logo { font-size: 22px; letter-spacing: 4px; }
 }
 
 @media (max-width: 500px) {
