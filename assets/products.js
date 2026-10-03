@@ -37,6 +37,16 @@ var DEPARTMENTS_META = {
     eyewear:      { title: "Окуляри",    subtitle: "Сонцезахисні та оптичні окуляри" }
 };
 
+/* Логотипи брендів для плиток у каталозі. Ключ — точне значення brand.
+   Бренду без логотипа тут немає — для нього плитка показує фото сумки.
+   Розширення файлів (.JPG) — у верхньому регістрі, як на диску: хостинг чутливий до регістру. */
+var BRAND_LOGOS = {
+    "Louis Vuitton":   "content/watermarked/Лого Лв.JPG",
+    "Chanel":          "content/watermarked/Лого Ш.JPG",
+    "Dior":            "content/watermarked/Лого Д.JPG",
+    "Dolce & Gabbana": "content/watermarked/Лого Дг.JPG"
+};
+
 var PRODUCTS = {
 
     "Лв-1": { dept:"bags", category:"Сумки", brand:"Louis Vuitton", name:"Vanity PM Monogram Empreinte Black", price:"4200 грн", code:"7322",
@@ -355,7 +365,12 @@ function getBrandsByDept(deptKey) {
         var b = p.brand || "Інше";
         if (!seen[b]) {
             seen[b] = true;
-            out.push({ brand: b, cover: (p.images && p.images.length) ? p.images[0] : "" });
+            var logo = Object.prototype.hasOwnProperty.call(BRAND_LOGOS, b) ? BRAND_LOGOS[b] : "";
+            out.push({
+                brand: b,
+                cover: logo || ((p.images && p.images.length) ? p.images[0] : ""),
+                isLogo: !!logo
+            });
         }
     });
     return out;

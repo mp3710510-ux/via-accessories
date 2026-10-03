@@ -34,6 +34,10 @@
 .brand-tile-image{width:100%;aspect-ratio:1/1;overflow:hidden;background:#f0ebe1;display:flex;align-items:center;justify-content:center}
 .brand-tile-image img{width:100%;height:100%;object-fit:cover;transition:transform 1s ease}
 .brand-tile:hover .brand-tile-image img{transform:scale(1.05)}
+/* Логотипи брендів: чорний знак на непрозорому білому JPG -> multiply розчиняє білий у кремовому фоні плитки */
+.brand-tile-image.is-logo{padding:12%}
+.brand-tile-image.is-logo img{object-fit:contain;mix-blend-mode:multiply}
+.brand-tile:hover .brand-tile-image.is-logo img{transform:scale(1.02)}
 .brand-tile-name{text-align:center;padding:20px 16px 0;font-family:'Cormorant Garamond',serif;font-size:18px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a}
 .catalog-empty{text-align:center;padding:60px 20px;color:#6b6258}
 .catalog-empty p{font-size:15px;margin-bottom:26px}
@@ -155,7 +159,7 @@ function makeBrandTile(deptKey, brandInfo) {
     a.className = 'brand-tile';
     var url = 'catalog.html?brand=' + encodeURIComponent(brandInfo.brand) + (deptKey ? '&dept=' + encodeURIComponent(deptKey) : '');
     a.href = url;
-    a.innerHTML = '<div class="brand-tile-image"><img src="' + brandInfo.cover + '" alt="' + brandInfo.brand + '"></div><div class="brand-tile-name">' + brandInfo.brand + '</div>';
+    a.innerHTML = '<div class="brand-tile-image' + (brandInfo.isLogo ? ' is-logo' : '') + '"><img src="' + brandInfo.cover + '" alt="' + brandInfo.brand + '"></div><div class="brand-tile-name">' + brandInfo.brand + '</div>';
     return a;
 }
 
