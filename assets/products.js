@@ -44,7 +44,13 @@ var BRAND_LOGOS = {
     "Louis Vuitton":   "content/watermarked/Лого Лв.JPG",
     "Chanel":          "content/watermarked/Лого Ш.JPG",
     "Dior":            "content/watermarked/Лого Д.JPG",
-    "Dolce & Gabbana": "content/watermarked/Лого Дг.JPG"
+    "Dolce & Gabbana": "content/watermarked/Лого Дг.JPG",
+    "Balenciaga":      "content/watermarked/Лого Бл.JPG",
+    "Coach":           "content/watermarked/Лого Кч.JPG",
+    "Hermès":          "content/watermarked/Лого Н.JPG",
+    "Loro Piana":      "content/watermarked/Лого Лп.JPG",
+    "Prada":           "content/watermarked/Лого П.JPG",
+    "Bottega Veneta":  "content/watermarked/Лого Бв.JPG"
 };
 
 var PRODUCTS = {
