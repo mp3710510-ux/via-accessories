@@ -39,18 +39,18 @@ var DEPARTMENTS_META = {
 
 /* Логотипи брендів для плиток у каталозі. Ключ — точне значення brand.
    Бренду без логотипа тут немає — для нього плитка показує фото сумки.
-   Розширення файлів (.JPG) — у верхньому регістрі, як на диску: хостинг чутливий до регістру. */
+   Розширення файлів (.jpg) — у нижньому регістрі, як у git: хостинг чутливий до регістру. */
 var BRAND_LOGOS = {
-    "Louis Vuitton":   "content/watermarked/Лого Лв.JPG",
-    "Chanel":          "content/watermarked/Лого Ш.JPG",
-    "Dior":            "content/watermarked/Лого Д.JPG",
-    "Dolce & Gabbana": "content/watermarked/Лого Дг.JPG",
-    "Balenciaga":      "content/watermarked/Лого Бл.JPG",
-    "Coach":           "content/watermarked/Лого Кч.JPG",
-    "Hermès":          "content/watermarked/Лого Н.JPG",
-    "Loro Piana":      "content/watermarked/Лого Лп.JPG",
-    "Prada":           "content/watermarked/Лого П.JPG",
-    "Bottega Veneta":  "content/watermarked/Лого Бв.JPG"
+    "Louis Vuitton":   "content/watermarked/Лого Лв.jpg",
+    "Chanel":          "content/watermarked/Лого Ш.jpg",
+    "Dior":            "content/watermarked/Лого Д.jpg",
+    "Dolce & Gabbana": "content/watermarked/Лого Дг.jpg",
+    "Balenciaga":      "content/watermarked/Лого Бл.jpg",
+    "Coach":           "content/watermarked/Лого Кч.jpg",
+    "Hermès":          "content/watermarked/Лого Н.jpg",
+    "Loro Piana":      "content/watermarked/Лого Лп.jpg",
+    "Prada":           "content/watermarked/Лого П.jpg",
+    "Bottega Veneta":  "content/watermarked/Лого Бв.jpg"
 };
 
 var PRODUCTS = {
