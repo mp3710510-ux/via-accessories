@@ -45,12 +45,12 @@ var BRAND_LOGOS = {
     "Chanel":          "content/watermarked/Лого Ш.JPG",
     "Dior":            "content/watermarked/Лого Д.JPG",
     "Dolce & Gabbana": "content/watermarked/Лого Дг.JPG",
-    "Balenciaga":      "content/watermarked/Лого Бл.JPG",
-    "Coach":           "content/watermarked/Лого Кч.JPG",
-    "Hermès":          "content/watermarked/Лого Н.JPG",
-    "Loro Piana":      "content/watermarked/Лого Лп.JPG",
-    "Prada":           "content/watermarked/Лого П.JPG",
-    "Bottega Veneta":  "content/watermarked/Лого Бв.JPG"
+    "Balenciaga":      "content/watermarked/Лого Бл.jpg",
+    "Coach":           "content/watermarked/Лого Кч.jpg",
+    "Hermès":          "content/watermarked/Лого Н.jpg",
+    "Loro Piana":      "content/watermarked/Лого Лп.jpg",
+    "Prada":           "content/watermarked/Лого П.jpg",
+    "Bottega Veneta":  "content/watermarked/Лого Бв.jpg"
 };
 
 var PRODUCTS = {
