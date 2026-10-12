@@ -1,0 +1,11 @@
+content/raw/
+Thumbs.db
+desktop.ini
+.DS_Store
+.mcp.json
+
+# Оригінали відео: на сайт йдуть стиснені копії з content/optimized/video/ (оригінали лишаються на диску)
+content/watermarked/*.mp4
+content/watermarked/*.MP4
+content/watermarked/*.mov
+content/watermarked/*.MOV

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Товар — via.accessories</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://via-accessories.com.ua/catalog.html">
+<link rel="icon" href="favicon.ico" sizes="any">
+</head>
+<body>
+<!-- Стара адреса product.html?id=... перекидає на нову статичну сторінку товару (products/...).
+     Сторінки товарів створює build_pages.py. -->
+<noscript><p><a href="catalog.html">Перейти до каталогу</a></p></noscript>
+<script src="assets/product-urls.js"></script>
+<script>
+(function () {
+    var id = new URLSearchParams(window.location.search).get('id');
+    if (id && PRODUCT_URLS[id]) {
+        window.location.replace(PRODUCT_URLS[id]);
+    } else {
+        window.location.replace('catalog.html');
+    }
+})();
+</script>
+</body>
+</html>
