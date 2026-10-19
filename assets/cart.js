@@ -8,7 +8,7 @@
    ============================================================ */
 
 var CART_KEY = 'mystore_cart';
-var TG_NICK = '-';
+var TG_NICK = 'via_manager';
 
 function getCart() {
     try {
@@ -135,7 +135,7 @@ function buildOrderText() {
     var sum = 0;
     for (var i = 0; i < cart.length; i++) {
         var it = cart[i];
-        text += '• ' + it.name + ' — ' + it.price;
+        text += '• ' + it.name + ' - ' + it.price;
         if (it.code) text += ', (код:' + it.code + ')';
         if (it.qty > 1) text += ' × ' + it.qty;
         text += '\n';

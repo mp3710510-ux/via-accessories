@@ -88,7 +88,7 @@ MAIN_SIZES = "(max-width:1000px) calc(100vw - 50px), 650px"      # головн�
 THUMB_SIZES = "(max-width:1000px) 22vw, 150px"                     # мініатюри галереї
 CARD_SIZES = "(max-width:500px) 100vw, (max-width:900px) 50vw, 25vw"   # картки в сітці 4/2/1
 TILE_SIZES = "(max-width:900px) 50vw, 20vw"                        # плитки брендів на сторінці відділу
-TG_NICK = "-"                                    # як у product.html / cart.js
+TG_NICK = "via_manager"                                    # як у product.html / cart.js
 # Сторінки сайту для sitemap (товари додаються автоматично)
 STATIC_PAGES = ["", "catalog.html", "contacts.html", "delivery.html", "returns.html"]  # "" = головна
 # -------------------------------------------------------------------------
