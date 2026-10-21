@@ -90,7 +90,7 @@ CARD_SIZES = "(max-width:500px) 100vw, (max-width:900px) 50vw, 25vw"   # кар�
 TILE_SIZES = "(max-width:900px) 50vw, 20vw"                        # плитки брендів на сторінці відділу
 TG_NICK = "via_manager"                                    # як у product.html / cart.js
 # Сторінки сайту для sitemap (товари додаються автоматично)
-STATIC_PAGES = ["", "catalog.html", "contacts.html", "delivery.html", "returns.html"]  # "" = головна
+STATIC_PAGES = ["", "catalog.html", "contacts.html", "delivery.html", "returns.html", "terms.html", "privacy.html"]  # "" = головна
 # -------------------------------------------------------------------------
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
