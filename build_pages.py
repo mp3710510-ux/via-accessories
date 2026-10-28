@@ -780,7 +780,9 @@ def build_feed(products, slugs, depts):
         ET.SubElement(it, g("product_type")).text = ("%s > %s" % (dept_title, brand)) if has_brand else dept_title
         count += 1
     ET.indent(rss, space="  ")
-    ET.ElementTree(rss).write(os.path.join(ROOT, "feed.xml"), encoding="utf-8", xml_declaration=True)
+    data = ET.tostring(rss, encoding="utf-8", xml_declaration=True)     # байти, переноси рядків завжди LF
+    with open(os.path.join(ROOT, "feed.xml"), "wb") as f:
+        f.write(data + b"\n")
     return count, skipped
 
 
