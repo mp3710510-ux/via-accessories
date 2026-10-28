@@ -19,7 +19,7 @@ build_pages.py — генератор статичних сторінок тов
     data-brand): є сторінка — веде на неї, ще немає — на catalog.html?...;
   * створює assets/product-urls.js — відповідність id товару -> адреса сторінки
     (її використовують каталог, головна, кошик і старий product.html?id=...);
-  * створює sitemap.xml та robots.txt.
+  * створює sitemap.xml, robots.txt і feed.xml (фід товарів для Google Merchant Center).
 
 Усі згенеровані файли можна безпечно перегенерувати: папки products/, brands/, category/
 перед генерацією очищуються від старих *.html (щоб не лишалось сторінок видалених товарів).
@@ -51,6 +51,21 @@ RETURN_POLICY = {
     "returnMethod": "https://schema.org/ReturnByMail",
     "returnFees": "https://schema.org/ReturnFeesCustomerResponsibility",  # пересилання оплачує покупець
 }
+# --- фід для Google Merchant Center (feed.xml) ---
+FEED_NS = "http://base.google.com/ns/1.0"
+FEED_TITLE = "via.accessories"
+FEED_DESCRIPTION = "Каталог товарів via.accessories: сумки та аксесуари. Доставка по Україні та Європі."
+FEED_AVAILABILITY = "in_stock"       # in_stock / out_of_stock / preorder (для всіх товарів фіду)
+# Категорії Google Product Taxonomy за відділами сайту (https://www.google.com/basepages/producttype/taxonomy.en-US.txt)
+GOOGLE_CATEGORY = {
+    "bags": "Apparel & Accessories > Handbags, Wallets & Cases > Handbags",     # id 6551
+    "shoes": "Apparel & Accessories > Shoes",
+    "watches": "Apparel & Accessories > Jewelry > Watches",
+    "jewelry": "Apparel & Accessories > Jewelry",
+    "accessories": "Apparel & Accessories > Clothing Accessories",
+    "eyewear": "Apparel & Accessories > Clothing Accessories > Sunglasses",
+}
+
 # Адреси сторінок відділів (латиницею): ключ відділу з products.js -> ім'я файлу в category/
 DEPT_SLUGS = {
     "bags": "sumky",
@@ -722,6 +737,53 @@ def write(path, text):
         f.write(text)
 
 
+def build_feed(products, slugs, depts):
+    """feed.xml для Google Merchant Center (RSS 2.0 + g:). Один item на кожну сторінку товару;
+    дані ті самі, що й на сторінках (products.js), тому фід і сайт не розходяться.
+    Товар без ціни/фото у фід не потрапляє (Merchant такі відхиляє). Повертає (кількість item, пропущені)."""
+    import xml.etree.ElementTree as ET
+    ET.register_namespace("g", FEED_NS)
+    g = lambda tag: "{%s}%s" % (FEED_NS, tag)
+    rss = ET.Element("rss", {"version": "2.0"})
+    ch = ET.SubElement(rss, "channel")
+    ET.SubElement(ch, "title").text = FEED_TITLE
+    ET.SubElement(ch, "link").text = SITE_URL
+    ET.SubElement(ch, "description").text = FEED_DESCRIPTION
+    count, skipped = 0, []
+    for pid, p in products.items():
+        num = price_number(p)
+        images = p.get("images") or []
+        if num is None or not images:
+            skipped.append(pid)
+            continue
+        brand = p.get("brand") or ""
+        has_brand = bool(brand) and brand != "Інше"
+        dept = p.get("dept") or ""
+        dept_title = depts.get(dept, {}).get("title") or p.get("category") or dept
+        it = ET.SubElement(ch, "item")
+        ET.SubElement(it, g("id")).text = slugs[pid]
+        ET.SubElement(it, g("title")).text = trim(full_name_of(p), 150)
+        ET.SubElement(it, g("description")).text = trim(re.sub(r"<[^>]+>", " ", p.get("description") or full_name_of(p)), 5000)
+        ET.SubElement(it, g("link")).text = "%s/products/%s.html" % (SITE_URL, slugs[pid])
+        ET.SubElement(it, g("image_link")).text = "%s/%s" % (SITE_URL, url_path(images[0]))
+        for extra in images[1:11]:
+            ET.SubElement(it, g("additional_image_link")).text = "%s/%s" % (SITE_URL, url_path(extra))
+        ET.SubElement(it, g("availability")).text = FEED_AVAILABILITY
+        ET.SubElement(it, g("price")).text = "%.2f %s" % (num, CURRENCY)
+        if has_brand:
+            ET.SubElement(it, g("brand")).text = brand
+        ET.SubElement(it, g("condition")).text = "new"
+        ET.SubElement(it, g("identifier_exists")).text = "no"
+        cat = GOOGLE_CATEGORY.get(dept)
+        if cat:
+            ET.SubElement(it, g("google_product_category")).text = cat
+        ET.SubElement(it, g("product_type")).text = ("%s > %s" % (dept_title, brand)) if has_brand else dept_title
+        count += 1
+    ET.indent(rss, space="  ")
+    ET.ElementTree(rss).write(os.path.join(ROOT, "feed.xml"), encoding="utf-8", xml_declaration=True)
+    return count, skipped
+
+
 def main():
     products, depts, logos = load_products()
     slugs = make_slugs(products)
@@ -854,7 +916,13 @@ def main():
     with open(os.path.join(ROOT, "robots.txt"), "w", encoding="utf8", newline="\n") as f:
         f.write("User-agent: *\nAllow: /\nDisallow: /cart.html\n\nSitemap: %s/sitemap.xml\n" % SITE_URL)
 
+    # feed.xml для Google Merchant Center
+    feed_count, feed_skipped = build_feed(products, slugs, depts)
+    if feed_skipped:
+        print("Увага: у фід не потрапили товари без ціни або фото: %s" % ", ".join(feed_skipped))
+
     print("Створено сторінок товарів: %d (з ціною: %d, без ціни: %d)" % (len(products), priced, len(products) - priced))
+    print("feed.xml (Google Merchant Center): %d товарів" % feed_count)
     print("Сторінок брендів: %d, відділів: %d" % (len(brand_pages), len(dept_pages)))
     print("Оновлено файлів із навігаційними посиланнями: %d" % nav_changed)
     print("Нових WebP-копій: %d, обкладинок відео: %d, стиснених відео: %d, видалено застарілих: %d" % (made_img, made_poster, made_video, removed_opt))
