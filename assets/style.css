@@ -443,3 +443,77 @@ picture { display: contents; }
     .footer-grid { grid-template-columns: 1fr; }
     .footer-logo { font-size: 24px; letter-spacing: 3px; }
 }
+
+/* ===== ОФОРМЛЕННЯ ЗАМОВЛЕННЯ (модальне вікно, assets/order.js) ===== */
+.cart-order {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: var(--color-gold);
+    color: #1c1a17;
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    transition: background 0.3s;
+}
+.cart-order:hover { background: #1c1a17; color: #f5f1ea; }
+
+html.order-open { overflow: hidden; }
+.order-overlay[hidden] { display: none; }
+.order-overlay {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(28,26,23,0.72);
+    display: flex; align-items: center; justify-content: center;
+    padding: 16px; overflow-y: auto;
+}
+.order-modal {
+    position: relative; width: 100%; max-width: 420px;
+    background: #f5f1ea; color: #1c1a17;
+    padding: 40px 32px 28px; border-radius: 2px;
+    border-top: 3px solid var(--color-gold);
+    font-family: 'Montserrat', sans-serif;
+    outline: none;
+}
+.order-close {
+    position: absolute; top: 8px; right: 8px; width: 44px; height: 44px;
+    background: none; border: none; font-size: 18px; color: #6b6258; cursor: pointer;
+}
+.order-close:hover { color: #1c1a17; }
+.order-title {
+    font-family: 'Cormorant Garamond', serif; font-weight: 400;
+    font-size: 28px; letter-spacing: 1px; margin-bottom: 24px; text-align: center;
+}
+.order-label {
+    display: block; margin: 14px 0 6px;
+    font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #6b6258;
+}
+.order-input {
+    width: 100%; padding: 14px; background: #fff;
+    border: 1px solid rgba(28,26,23,0.25); border-radius: 2px;
+    font-family: inherit; font-size: 16px; color: #1c1a17;
+}
+.order-input:focus { outline: none; border-color: var(--color-gold); box-shadow: 0 0 0 2px rgba(169,129,74,0.25); }
+.order-error {
+    display: none; margin-top: 14px; font-size: 13px; line-height: 1.5; color: #a3261a;
+}
+.order-error a { color: inherit; text-decoration: underline; }
+.order-submit {
+    display: block; width: 100%; margin-top: 20px; padding: 16px;
+    background: #1c1a17; color: #f5f1ea; border: none; border-radius: 2px;
+    font-family: inherit; font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+    cursor: pointer; transition: background 0.3s;
+}
+.order-submit:hover:not(:disabled) { background: var(--color-gold); color: #1c1a17; }
+.order-submit:disabled { opacity: 0.6; cursor: wait; }
+.order-note { margin-top: 14px; font-size: 11px; line-height: 1.5; color: #6b6258; text-align: center; }
+.order-success { text-align: center; padding: 12px 0 4px; }
+.order-success[hidden], .order-form-wrap[hidden] { display: none; }
+.order-success-text { font-family: 'Cormorant Garamond', serif; font-size: 24px; line-height: 1.4; }
+@media (max-width: 480px) {
+    .order-modal { padding: 36px 20px 22px; }
+    .order-title { font-size: 24px; }
+}

@@ -1,0 +1,9 @@
+name = "via-order"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+workers_dev = true
+
+# Секрети BOT_TOKEN і CHAT_ID задаються командами:
+#   wrangler secret put BOT_TOKEN
+#   wrangler secret put CHAT_ID
+preview_urls = false

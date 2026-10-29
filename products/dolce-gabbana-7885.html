@@ -68,6 +68,7 @@
 .actions{display:flex;flex-direction:column;gap:14px;margin-bottom:34px}
 .btn-primary{display:flex;align-items:center;justify-content:center;gap:12px;padding:18px 32px;background:#1c1a17;color:#f5f1ea;text-decoration:none;font-size:13px;letter-spacing:3px;text-transform:uppercase;border-radius:2px;transition:background 0.3s,transform 0.3s;border:none;cursor:pointer;font-family:'Montserrat',sans-serif}
 .btn-primary:hover{background:#2AABEE;transform:translateY(-2px)}
+.btn-order{background:#1c1a17}.btn-order:hover{background:var(--color-gold);color:#1c1a17}
 .btn-primary svg{width:20px;height:20px;fill:currentColor}
 .btn-cart{display:flex;align-items:center;justify-content:center;gap:12px;padding:18px 32px;background:var(--color-gold);color:#1c1a17;text-decoration:none;font-size:13px;letter-spacing:3px;text-transform:uppercase;border-radius:2px;transition:background 0.3s,transform 0.3s;border:none;cursor:pointer;font-family:'Montserrat',sans-serif}
 .btn-cart:hover{background:#b8954f;transform:translateY(-2px)}
@@ -203,6 +204,7 @@
 </div>
 <div class="actions">
 <button class="btn-cart" id="addCartBtn" type="button">Додати в кошик</button>
+<button class="btn-primary btn-order" id="orderProductBtn" type="button">Оформити замовлення</button>
 <a class="btn-primary" id="tgProductBtn" href="https://t.me/via_manager?text=%D0%94%D0%BE%D0%B1%D1%80%D0%BE%D0%B3%D0%BE%20%D0%B4%D0%BD%D1%8F%21%20%D0%A6%D1%96%D0%BA%D0%B0%D0%B2%D0%B8%D1%82%D1%8C%20%D1%82%D0%BE%D0%B2%D0%B0%D1%80%3A%20DG%20Logo%20Leopard%20Patent%20Mini%20Bag%20%284600%20%D0%B3%D1%80%D0%BD%2C%20%28%D0%BA%D0%BE%D0%B4%3A7885%29%29" target="_blank" rel="noopener">
 <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
 Написати в Telegram
@@ -389,6 +391,8 @@ addCartBtn.addEventListener('click', function() {
 <!-- Корзина общая для всех страниц: assets/cart.js -->
 <script src="../assets/nav.js" defer></script>
 <script src="../assets/cart.js" defer></script>
+<script src="../assets/config.js" defer></script>
+<script src="../assets/order.js" defer></script>
 
 </body>
 </html>
