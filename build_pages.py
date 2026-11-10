@@ -19,7 +19,10 @@ build_pages.py — генератор статичних сторінок тов
     data-brand): є сторінка — веде на неї, ще немає — на catalog.html?...;
   * створює assets/product-urls.js — відповідність id товару -> адреса сторінки
     (її використовують каталог, головна, кошик і старий product.html?id=...);
-  * створює sitemap.xml, robots.txt і feed.xml (фід товарів для Google Merchant Center).
+  * вписує товари прямо в HTML каталогу (catalog.html) і «Хітів сезону» на головній (index.html) —
+    між маркерами <!-- build:... -->, щоб пошуковик бачив посилання на товари без JavaScript;
+  * додає на сторінку товару блок «Схожі товари» (той самий бренд / відділ);
+  * створює sitemap.xml (з <lastmod>), robots.txt і feed.xml (фід товарів для Google Merchant Center).
 
 Усі згенеровані файли можна безпечно перегенерувати: папки products/, brands/, category/
 перед генерацією очищуються від старих *.html (щоб не лишалось сторінок видалених товарів).
@@ -103,6 +106,8 @@ MAIN_SIZES = "(max-width:1000px) calc(100vw - 50px), 650px"      # головн�
 THUMB_SIZES = "(max-width:1000px) 22vw, 150px"                     # мініатюри галереї
 CARD_SIZES = "(max-width:500px) 100vw, (max-width:900px) 50vw, 25vw"   # картки в сітці 4/2/1
 TILE_SIZES = "(max-width:900px) 50vw, 20vw"                        # плитки брендів на сторінці відділу
+SIMILAR_COUNT = 4                    # скільки «Схожих товарів» на сторінці товару (ряд із 4 карток)
+HITS_COUNT = 4                       # скільки карток у «Хітах сезону» на головній
 TG_NICK = "via_manager"                                    # як у product.html / cart.js
 # Сторінки сайту для sitemap (товари додаються автоматично)
 STATIC_PAGES = ["", "catalog.html", "contacts.html", "delivery.html", "returns.html", "terms.html", "privacy.html"]  # "" = головна
@@ -417,7 +422,7 @@ def brand_dept_phrase(dept_titles, lower):
     return phrase if lower else phrase[:1].upper() + phrase[1:]
 
 
-def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages):
+def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages, similar_html="", similar_json="{}"):
     page_rel = "products/%s.html" % slug
     page_url = "%s/%s" % (SITE_URL, page_rel)
     name = p["name"]
@@ -433,7 +438,15 @@ def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages):
     specs = p.get("specs") or {}
 
     full_name = ("%s %s" % (brand, name)) if has_brand and brand.lower() not in name.lower() else name
-    title = "%s — %s | via.accessories" % (full_name, p.get("category") or dept_title)
+    # «<Назва> | <Бренд> | via.accessories», не довше 60 символів. Задовго — без « | via.accessories»;
+    # і так задовго — вкорочуємо назву й додаємо код (щоб title схожих товарів не збігались)
+    brand_part = (" | %s" % brand) if has_brand else ""
+    title = name + brand_part + " | via.accessories"
+    if len(title) > 60:
+        title = name + (brand_part or " | via.accessories")
+    if len(title) > 60:
+        tail = (" (код %s)" % code) if code else ""
+        title = trim(name, 60 - len(brand_part or " | via.accessories") - len(tail) - 1) + tail + (brand_part or " | via.accessories")
     og_title = "%s — via.accessories" % full_name
 
     desc = (p.get("description") or "").strip()
@@ -442,7 +455,7 @@ def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages):
         tail.append("Код: %s." % code)
     if num is not None:
         tail.append("Ціна: %s." % price_text)
-    meta_desc = trim(desc, 160 - len(" ".join(tail)) - 1) if desc else full_name
+    meta_desc = trim(desc, 155 - len(" ".join(tail)) - 2) if desc else full_name
     meta_desc = (meta_desc + " " + " ".join(tail)).strip()
 
     abs_images = ["%s/%s" % (SITE_URL, url_path(i)) for i in images]
@@ -480,7 +493,7 @@ def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages):
         )
 
     # --- хлібні крихти: Головна › Бренд › Назва (бренд — посилання на його сторінку) ---
-    crumbs = ['<a href="../index.html">Головна</a>', '<span class="sep">›</span>']
+    crumbs = ['<a href="/">Головна</a>', '<span class="sep">›</span>']
     ld_crumbs = [("Головна", SITE_URL + "/")]
     if has_brand and brand in brand_pages:
         crumbs += ['<a href="../%s">%s</a>' % (brand_pages[brand], esc(brand)), '<span class="sep">›</span>']
@@ -573,6 +586,8 @@ def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages):
         "SPECS": spec_items,
         "TG_HREF": esc(tg_href),
         "PRODUCT_JSON": product_json,
+        "SIMILAR": similar_html,
+        "SIMILAR_JSON": similar_json,
     }
     out = tpl
     for k, v in repl.items():
@@ -598,7 +613,7 @@ def sync_nav_links(brand_pages, dept_pages):
 
     def fix(m):
         href, kind, value = m.group(1), m.group(2), m.group(3)
-        prefix = "../" if href.startswith("../") else ""
+        prefix = "../" if href.startswith("../") else "/" if href.startswith("/") else ""
         if kind == "dept":
             target = dept_pages.get(value) or "catalog.html?dept=%s" % urllib.parse.quote(value)
         else:
@@ -632,10 +647,10 @@ function picHtml(src, alt, sizes, eager, cls) {
 """
 
 
-def card_html(pid, p, slug, full_name, loading="lazy"):
-    """Картка товару, як у каталозі; посилання прямо в HTML."""
-    href = "../products/%s.html" % slug
-    img = picture_html(p["images"][0], full_name, CARD_SIZES, "../", loading) if p.get("images") else ""
+def card_html(pid, p, slug, full_name, loading="lazy", prefix="../"):
+    """Картка товару, як у каталозі; посилання прямо в HTML. prefix — шлях до кореня сайту."""
+    href = "%sproducts/%s.html" % (prefix, slug)
+    img = picture_html(p["images"][0], full_name, CARD_SIZES, prefix, loading) if p.get("images") else ""
     code = str(p.get("code") or "")
     num = price_number(p)
     price = '<div class="price">%s</div>' % esc((p.get("price") or "").strip()) if num is not None else ""
@@ -717,6 +732,103 @@ def brand_tiles_html(brands, brand_pages, logos, items):
     if not tiles:
         return ""
     return '<div class="brand-grid brand-tiles">\n%s\n</div>\n' % "\n".join(tiles)
+
+
+def similar_items(pid, products, limit=SIMILAR_COUNT):
+    """Схожі товари: спершу того ж бренду, потім того ж відділу, потім будь-які.
+    Беремо ті, що йдуть після поточного (по колу) — так посилання розподіляються по всьому каталогу."""
+    ids = list(products)
+    i = ids.index(pid)
+    ring = ids[i + 1:] + ids[:i]
+    p = products[pid]
+    brand, dept = p.get("brand") or "", p.get("dept") or ""
+    groups = [
+        [x for x in ring if brand and brand != "Інше" and products[x].get("brand") == brand],
+        [x for x in ring if products[x].get("dept") == dept],
+        ring,
+    ]
+    out = []
+    for g in groups:
+        for x in g:
+            if x not in out and len(out) < limit:
+                out.append(x)
+    return out
+
+
+def similar_block(pid, products, slugs, full_names):
+    ids = similar_items(pid, products)
+    if not ids:
+        return "", "{}"
+    cards = "\n".join(card_html(x, products[x], slugs[x], full_names[x], "lazy") for x in ids)
+    block = '<section class="similar">\n<h2>Схожі товари</h2>\n<div class="grid">\n%s\n</div>\n</section>\n\n' % cards
+    return block, listing_items_json([(x, products[x]) for x in ids])
+
+
+def pick_hits(products, limit=HITS_COUNT):
+    """Хіти сезону — як було в JS на головній: по одному товару з різних брендів, далі доповнюємо будь-якими."""
+    seen, picked = set(), []
+    for pid, p in products.items():
+        key = p.get("brand") or p.get("category")
+        if key not in seen and len(picked) < limit:
+            seen.add(key)
+            picked.append(pid)
+    for pid in products:
+        if len(picked) >= limit:
+            break
+        if pid not in picked:
+            picked.append(pid)
+    return picked
+
+
+def hit_card_html(pid, p, slug, full_name):
+    img = picture_html(p["images"][0], full_name, CARD_SIZES, "", "lazy") if p.get("images") else ""
+    return (
+        '<a href="products/%s.html" class="hit-card">'
+        '<div class="hit-card-image"><span class="hit-badge">Хіт</span>%s</div>'
+        '<div class="hit-card-caption"><div class="name">%s</div><div class="price">%s</div></div></a>'
+        % (slug, img, esc(p["name"]), esc((p.get("price") or "").strip()))
+    )
+
+
+def inject(rel, name, content):
+    """Вставляє згенерований HTML між <!-- build:NAME ... --> і <!-- /build:NAME --> у ручній сторінці."""
+    path = os.path.join(ROOT, rel)
+    with open(path, "rb") as f:
+        raw = f.read().decode("utf8")
+    rx = re.compile(r"(<!-- build:%s(?: [^>]*)? -->\n).*?(<!-- /build:%s -->)" % (re.escape(name), re.escape(name)), re.S)
+    if not rx.search(raw):
+        sys.exit("Помилка: у %s немає маркерів <!-- build:%s -->" % (rel, name))
+    new = rx.sub(lambda m: m.group(1) + content + m.group(2), raw, count=1)
+    if new != raw:
+        with open(path, "wb") as f:      # у бінарному режимі — щоб не змінювати переноси рядків
+            f.write(new.encode("utf8"))
+
+
+def lastmod_dates(rels):
+    """Дата останньої зміни сторінки для sitemap: змінена/нова (ще не в коміті) — сьогодні,
+    інакше дата останнього коміту файлу в git; без git — дата файлу."""
+    import datetime
+    today = datetime.date.today().isoformat()
+    dirty = None
+    try:
+        st = subprocess.run(["git", "status", "--porcelain", "-z", "--untracked-files=all"], cwd=ROOT,
+                            capture_output=True, check=True).stdout.decode("utf8")
+        dirty = {e[3:] for e in st.split("\0") if len(e) > 3}
+    except (OSError, subprocess.CalledProcessError):
+        pass
+    out = {}
+    for rel in rels:
+        d = None
+        if dirty is not None and rel not in dirty:
+            r = subprocess.run(["git", "log", "-1", "--format=%cs", "--", rel], cwd=ROOT, capture_output=True)
+            d = r.stdout.decode("utf8").strip() or None
+        if d is None:
+            if dirty is not None:
+                d = today
+            else:
+                d = datetime.date.fromtimestamp(os.path.getmtime(os.path.join(ROOT, rel))).isoformat()
+        out[rel] = d
+    return out
 
 
 def clean_dir(path):
@@ -834,7 +946,8 @@ def main():
 
     urls, priced = [], 0
     for pid, p in products.items():
-        page, page_url, num = build_page(tpl, pid, p, slugs[pid], depts, brand_pages, dept_pages)
+        sim_html, sim_json = similar_block(pid, products, slugs, full_names)
+        page, page_url, num = build_page(tpl, pid, p, slugs[pid], depts, brand_pages, dept_pages, sim_html, sim_json)
         write(os.path.join(OUT_DIR, slugs[pid] + ".html"), page)
         urls.append(page_url)
         priced += 1 if num is not None else 0
@@ -843,7 +956,7 @@ def main():
         ltpl = f.read()
     listing_urls = []
     home = ("Головна", SITE_URL + "/")
-    home_link = '<a href="../index.html">Головна</a><span class="sep">›</span>'
+    home_link = '<a href="/">Головна</a><span class="sep">›</span>'
 
     # --- сторінки брендів ---
     for brand in ordered_brands(brand_counts, first_seen):
@@ -881,6 +994,17 @@ def main():
         write(os.path.join(ROOT, rel), page)
         listing_urls.append(url)
 
+    # --- каталог: уся сітка товарів у HTML (JS лише вмикає кнопки; фільтри ?dept=/?brand= малює JS) ---
+    cat_cards = "\n".join(
+        card_html(pid, p, slugs[pid], full_names[pid], "high" if i < 4 else "lazy", "")
+        for i, (pid, p) in enumerate(products.items())
+    )
+    inject("catalog.html", "catalog-grid", '<div class="grid" id="catalogGrid">\n%s\n</div>\n' % cat_cards)
+    inject("catalog.html", "catalog-ld", breadcrumb_jsonld([home, ("Каталог", SITE_URL + "/catalog.html")]) + "\n")
+    # --- головна: «Хіти сезону» у HTML ---
+    hits = "\n".join(hit_card_html(pid, products[pid], slugs[pid], full_names[pid]) for pid in pick_hits(products))
+    inject("index.html", "hits", hits + "\n")
+
     # id -> адреса (для каталогу, головної, кошика, старого product.html)
     mapping = {pid: "products/%s.html" % slugs[pid] for pid in products}
     with open(os.path.join(ROOT, "assets", "product-urls.js"), "w", encoding="utf8", newline="\n") as f:
@@ -905,18 +1029,20 @@ def main():
             "}\n"
         )
 
-    # sitemap.xml
+    # sitemap.xml — усі публічні сторінки (без 404, кошика та старого product.html — у них noindex)
     locs = ["%s/%s" % (SITE_URL, pg) for pg in STATIC_PAGES] + listing_urls + urls
+    rels = {loc: (loc[len(SITE_URL) + 1:] or "index.html") for loc in locs}
+    dates = lastmod_dates(rels.values())
     with open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf8", newline="\n") as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         f.write('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
         for loc in locs:
-            f.write("  <url><loc>%s</loc></url>\n" % esc(loc))
+            f.write("  <url><loc>%s</loc><lastmod>%s</lastmod></url>\n" % (esc(loc), dates[rels[loc]]))
         f.write("</urlset>\n")
 
-    # robots.txt
+    # robots.txt — дозволено все (кошик закритий від індексу метатегом noindex)
     with open(os.path.join(ROOT, "robots.txt"), "w", encoding="utf8", newline="\n") as f:
-        f.write("User-agent: *\nAllow: /\nDisallow: /cart.html\n\nSitemap: %s/sitemap.xml\n" % SITE_URL)
+        f.write("User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n" % SITE_URL)
 
     # feed.xml для Google Merchant Center
     feed_count, feed_skipped = build_feed(products, slugs, depts)
