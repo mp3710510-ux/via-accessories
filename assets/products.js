@@ -6,8 +6,11 @@
    беруть дані звідси.
 
    ЯК ДОДАТИ ТОВАР:
-   Скопіюйте будь-який блок нижче, поміняйте ключ (id) на новий
-   унікальний, наприклад "bags-5", і заповніть поля.
+   Зручніше через локальну адмінку (C:\Users\zmnat\via-admin): вона сама
+   записує цей файл, медіа і запускає build_pages.py. Блок PRODUCTS
+   адмінка переписує повністю — коментарі всередині нього не зберігаються.
+   Вручну: скопіюйте будь-який блок нижче, поміняйте ключ (id) на новий
+   унікальний (<префікс бренду>-<номер>, напр. "Лв-15") і заповніть поля.
 
    ПОЛЯ ТОВАРУ:
    - dept        — ключ відділу (bags, shoes, watches, jewelry,
@@ -25,6 +28,14 @@
                    в каталозі.
    - video       — шлях до відео (mp4) або null, якщо відео немає
    - description — текст опису
+   - longDescription — (необов'язково) довгий опис; якщо заповнений,
+                   на сторінці товару з'являється блок «Опис»
+                   (абзаци розділяються порожнім рядком)
+   - hit         — (необов'язково) true: «Новинка / Хіт» — товар
+                   першим потрапляє в «Хіти сезону» на головній
+   - hidden      — (необов'язково) true: немає в наявності — товару немає
+                   в каталозі, sitemap.xml і feed.xml, а його сторінка
+                   лишається з позначкою «Немає в наявності»
    - specs       — об'єкт "характеристика: значення"
    ============================================================ */
 
@@ -56,11 +67,9 @@ var BRAND_LOGOS = {
 var PRODUCTS = {
 
     "Лв-1": { dept:"bags", category:"Сумки", brand:"Louis Vuitton", name:"Vanity PM Monogram Empreinte Black", price:"4200 грн", code:"7322",
-        images:["content/watermarked/Лв 1-1.jpg","content/watermarked/Лв 1-2.jpg","content/watermarked/Лв 1-3.jpg"],
-        video:"content/watermarked/Лв 1-4.mp4",
+        images:["content/watermarked/Лв 1-1.jpg","content/watermarked/Лв 1-2.jpg","content/watermarked/Лв 1-3.jpg"], video:"content/watermarked/Лв 1-4.mp4",
         description:"Сумка Louis Vuitton Vanity PM Monogram Empreinte Black. Матеріал — шкіра, фурнітура золотого кольору. У комплекті коробка, пильник та документи.",
         specs:{"Розмір":"19/14/10","Матеріал":"Шкіра","Комплект":"Коробка, пильник, документи","Фурнітура":"Золото"} },
-
     "Лв-2": { dept:"bags", category:"Сумки", brand:"Louis Vuitton", name:"Vanity PM Monogram Multicolor", price:"5600 грн", code:"7478",
         images:["content/watermarked/Лв 2-1.jpg","content/watermarked/Лв 2-2.jpg","content/watermarked/Лв 2-3.jpg"], video:"content/watermarked/Лв 2-4.mp4",
         description:"Сумка Louis Vuitton Vanity PM Monogram Multicolor. Матеріал — шкіра. Повний комплект.",
@@ -184,7 +193,6 @@ var PRODUCTS = {
         images:["content/watermarked/Ш 7-1.jpg","content/watermarked/Ш 7-2.jpg","content/watermarked/Ш 7-3.jpg"], video:"content/watermarked/Ш 7-4.mp4",
         description:"Сумка Chanel Top Handle Flap Bag White. Матеріал — шкіра. Повний комплект.",
         specs:{"Розмір":"32x15x11,5","Матеріал":"шкіра","Комплект":"Повний комплект"} },
-
     "Ш-8": { dept:"bags", category:"Сумки", brand:"Chanel", name:"Vanity Case Bag in White Leather", price:"5200 грн", code:"3967",
         images:["content/watermarked/Ш 8-1.jpg","content/watermarked/Ш 8-2.jpg","content/watermarked/Ш 8-3.jpg"], video:"content/watermarked/Ш 8-4.mp4",
         description:"Сумка Chanel Vanity Case Bag in White Leather. Матеріал — шкіра. Повний комплект.",
@@ -335,7 +343,7 @@ var PRODUCTS = {
 function getProductsByDept(deptKey) {
     var out = [];
     Object.keys(PRODUCTS).forEach(function (id) {
-        if (PRODUCTS[id].dept === deptKey) {
+        if (PRODUCTS[id].dept === deptKey && !PRODUCTS[id].hidden) {   /* hidden — немає в наявності */
             var p = PRODUCTS[id];
             out.push({
                 id: id, dept: p.dept, category: p.category, brand: p.brand, name: p.name,
@@ -351,6 +359,7 @@ function getAllProducts() {
     var out = [];
     Object.keys(PRODUCTS).forEach(function (id) {
         var p = PRODUCTS[id];
+        if (p.hidden) return;   /* немає в наявності — не показуємо в списках */
         out.push({
             id: id, dept: p.dept, category: p.category, brand: p.brand, name: p.name,
             price: p.price, code: p.code, images: p.images, video: p.video,

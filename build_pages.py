@@ -24,6 +24,15 @@ build_pages.py — генератор статичних сторінок тов
   * додає на сторінку товару блок «Схожі товари» (той самий бренд / відділ);
   * створює sitemap.xml (з <lastmod>), robots.txt і feed.xml (фід товарів для Google Merchant Center).
 
+Необов'язкові поля товару (їх ставить адмінка via-admin):
+  * longDescription — довгий опис: блок «Опис» під товаром (лише якщо заповнений);
+  * hit: true — «Новинка / Хіт»: товар першим потрапляє в «Хіти сезону» на головній;
+  * hidden: true — немає в наявності: товару немає в каталозі, на сторінках бренду/відділу, у «Схожих»,
+    «Хітах», sitemap.xml і feed.xml. Його сторінка лишається за тією самою адресою (без noindex) з
+    позначкою «Немає в наявності», без кнопок кошика/замовлення і з availability OutOfStock у JSON-LD —
+    так радить Google для тимчасово відсутніх товарів: сторінка не випадає з індексу і повертається
+    з усією історією, щойно товар знову з'явиться.
+
 Усі згенеровані файли можна безпечно перегенерувати: папки products/, brands/, category/
 перед генерацією очищуються від старих *.html (щоб не лишалось сторінок видалених товарів).
 """
@@ -40,6 +49,7 @@ import urllib.parse
 # ----------------------------- НАЛАШТУВАННЯ -----------------------------
 SITE_URL = "https://via-accessories.com.ua"      # без слеша в кінці
 AVAILABILITY = "https://schema.org/InStock"      # наявність для schema.org Offer
+OUT_OF_STOCK = "https://schema.org/OutOfStock"   # для прихованих товарів (hidden: true)
                                                   # (інші варіанти: https://schema.org/PreOrder,
                                                   #  https://schema.org/OutOfStock)
 CURRENCY = "UAH"
@@ -422,6 +432,33 @@ def brand_dept_phrase(dept_titles, lower):
     return phrase if lower else phrase[:1].upper() + phrase[1:]
 
 
+# Стилі додаються на сторінку лише тоді, коли потрібні (інші сторінки лишаються без змін)
+STOCK_OUT_CSS = (
+    ".stock-out{display:inline-block;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#1c1a17;"
+    "border:1px solid var(--color-gold);padding:10px 18px;border-radius:2px;margin:-12px 0 26px}\n"
+    ".btn-cart,.btn-order{display:none}\n"
+)
+LONG_DESC_CSS = (
+    ".long-desc{max-width:1500px;margin:0 auto;padding:0 60px 90px}\n"
+    ".long-desc-inner{max-width:860px;margin:0 auto;padding-top:60px;border-top:1px solid rgba(0,0,0,0.08)}\n"
+    ".long-desc h2{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:400;letter-spacing:6px;"
+    "text-transform:uppercase;color:#1c1a17;text-align:center;margin-bottom:34px}\n"
+    ".long-desc p{font-size:15px;font-weight:300;line-height:1.9;letter-spacing:0.5px;color:#4a443c;margin-bottom:18px}\n"
+    "@media (max-width:1000px){.long-desc{padding:0 25px 60px}.long-desc-inner{padding-top:44px}}\n"
+    "@media (max-width:900px){.long-desc h2{font-size:24px;letter-spacing:4px;margin-bottom:24px}}\n"
+)
+
+
+def long_desc_html(text):
+    """Довгий опис -> <section>; абзаци — через порожній рядок, перенос рядка всередині абзацу — <br>."""
+    text = (text or "").replace("\r\n", "\n").strip()
+    if not text:
+        return ""
+    paras = [x.strip() for x in re.split(r"\n\s*\n", text) if x.strip()]
+    body = "\n".join("<p>%s</p>" % "<br>".join(esc(l.strip()) for l in para.split("\n")) for para in paras)
+    return '<section class="long-desc"><div class="long-desc-inner">\n<h2>Опис</h2>\n%s\n</div></section>\n\n' % body
+
+
 def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages, similar_html="", similar_json="{}"):
     page_rel = "products/%s.html" % slug
     page_url = "%s/%s" % (SITE_URL, page_rel)
@@ -436,6 +473,7 @@ def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages, similar_html="
     images = p.get("images") or []
     video = p.get("video") or None
     specs = p.get("specs") or {}
+    hidden = bool(p.get("hidden"))
 
     full_name = ("%s %s" % (brand, name)) if has_brand and brand.lower() not in name.lower() else name
     # «<Назва> | <Бренд> | via.accessories», не довше 60 символів. Задовго — без « | via.accessories»;
@@ -479,7 +517,7 @@ def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages, similar_html="
             "@type": "Offer",
             "price": num,
             "priceCurrency": CURRENCY,
-            "availability": AVAILABILITY,
+            "availability": OUT_OF_STOCK if hidden else AVAILABILITY,
             "url": page_url,
             "hasMerchantReturnPolicy": RETURN_POLICY,
         }
@@ -542,6 +580,13 @@ def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages, similar_html="
         thumbs.append('<div class="thumb video-thumb" data-index="%d">%s</div>' % (len(images), cover))
 
     price_block = '<div class="price" id="productPrice">%s</div>\n' % esc(price_text) if num is not None else ""
+    extra_css = ""
+    if hidden:
+        price_block += '<div class="stock-out">Немає в наявності</div>\n'
+        extra_css += STOCK_OUT_CSS
+    long_html = long_desc_html(p.get("longDescription") or "")
+    if long_html:
+        extra_css += LONG_DESC_CSS
     spec_items = "".join("<li><span>%s</span><span>%s</span></li>" % (esc(k), esc(v)) for k, v in specs.items())
 
     tg_code = ("(код:%s)" % code) if code else ""
@@ -588,6 +633,8 @@ def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages, similar_html="
         "PRODUCT_JSON": product_json,
         "SIMILAR": similar_html,
         "SIMILAR_JSON": similar_json,
+        "EXTRA_CSS": ('<style>\n%s</style>\n' % extra_css) if extra_css else "",
+        "LONG_DESC": long_html,
     }
     out = tpl
     for k, v in repl.items():
@@ -739,7 +786,7 @@ def similar_items(pid, products, limit=SIMILAR_COUNT):
     Беремо ті, що йдуть після поточного (по колу) — так посилання розподіляються по всьому каталогу."""
     ids = list(products)
     i = ids.index(pid)
-    ring = ids[i + 1:] + ids[:i]
+    ring = [x for x in ids[i + 1:] + ids[:i] if not products[x].get("hidden")]
     p = products[pid]
     brand, dept = p.get("brand") or "", p.get("dept") or ""
     groups = [
@@ -767,7 +814,13 @@ def similar_block(pid, products, slugs, full_names):
 def pick_hits(products, limit=HITS_COUNT):
     """Хіти сезону — як було в JS на головній: по одному товару з різних брендів, далі доповнюємо будь-якими."""
     seen, picked = set(), []
+    for pid, p in products.items():               # «Новинка / Хіт» з адмінки — першими
+        if p.get("hit") and len(picked) < limit:
+            seen.add(p.get("brand") or p.get("category"))
+            picked.append(pid)
     for pid, p in products.items():
+        if pid in picked:
+            continue
         key = p.get("brand") or p.get("category")
         if key not in seen and len(picked) < limit:
             seen.add(key)
@@ -901,6 +954,8 @@ def build_feed(products, slugs, depts):
 def main():
     products, depts, logos = load_products()
     slugs = make_slugs(products)
+    # приховані (немає в наявності): сторінка є, але в списках, sitemap і фіді їх немає
+    visible = {pid: p for pid, p in products.items() if not p.get("hidden")}
     with open(os.path.join(ROOT, "templates", "product.tpl.html"), encoding="utf8") as f:
         tpl = f.read()
 
@@ -913,8 +968,9 @@ def main():
             first_seen.setdefault(b, len(first_seen))
             if d not in brand_depts.setdefault(b, []):
                 brand_depts[b].append(d)
-            dept_brand_counts.setdefault(d, {})
-            dept_brand_counts[d][b] = dept_brand_counts[d].get(b, 0) + 1
+            if pid in visible:
+                dept_brand_counts.setdefault(d, {})
+                dept_brand_counts[d][b] = dept_brand_counts[d].get(b, 0) + 1
     brand_pages = {b: "brands/%s.html" % slugify(b) for b in brand_counts}
     used_depts = [d for d in DEPT_SLUGS if any(p.get("dept") == d for p in products.values())]
     dept_pages = {d: "category/%s.html" % DEPT_SLUGS[d] for d in used_depts}
@@ -949,7 +1005,8 @@ def main():
         sim_html, sim_json = similar_block(pid, products, slugs, full_names)
         page, page_url, num = build_page(tpl, pid, p, slugs[pid], depts, brand_pages, dept_pages, sim_html, sim_json)
         write(os.path.join(OUT_DIR, slugs[pid] + ".html"), page)
-        urls.append(page_url)
+        if pid in visible:
+            urls.append(page_url)
         priced += 1 if num is not None else 0
 
     with open(os.path.join(ROOT, "templates", "listing.tpl.html"), encoding="utf8") as f:
@@ -960,7 +1017,7 @@ def main():
 
     # --- сторінки брендів ---
     for brand in ordered_brands(brand_counts, first_seen):
-        items = [(pid, p) for pid, p in products.items() if p.get("brand") == brand]
+        items = [(pid, p) for pid, p in visible.items() if p.get("brand") == brand]
         dtitles = [depts.get(d, {}).get("title", d) for d in brand_depts[brand]]
         rel = brand_pages[brand]
         low = brand_dept_phrase(dtitles, lower=True)
@@ -977,7 +1034,7 @@ def main():
 
     # --- сторінки відділів ---
     for d in used_depts:
-        items = [(pid, p) for pid, p in products.items() if p.get("dept") == d]
+        items = [(pid, p) for pid, p in visible.items() if p.get("dept") == d]
         dtitle = depts.get(d, {}).get("title", d)
         rel = dept_pages[d]
         bs = ordered_brands(dept_brand_counts.get(d, {}), first_seen)
@@ -997,12 +1054,12 @@ def main():
     # --- каталог: уся сітка товарів у HTML (JS лише вмикає кнопки; фільтри ?dept=/?brand= малює JS) ---
     cat_cards = "\n".join(
         card_html(pid, p, slugs[pid], full_names[pid], "high" if i < 4 else "lazy", "")
-        for i, (pid, p) in enumerate(products.items())
+        for i, (pid, p) in enumerate(visible.items())
     )
     inject("catalog.html", "catalog-grid", '<div class="grid" id="catalogGrid">\n%s\n</div>\n' % cat_cards)
     inject("catalog.html", "catalog-ld", breadcrumb_jsonld([home, ("Каталог", SITE_URL + "/catalog.html")]) + "\n")
     # --- головна: «Хіти сезону» у HTML ---
-    hits = "\n".join(hit_card_html(pid, products[pid], slugs[pid], full_names[pid]) for pid in pick_hits(products))
+    hits = "\n".join(hit_card_html(pid, products[pid], slugs[pid], full_names[pid]) for pid in pick_hits(visible))
     inject("index.html", "hits", hits + "\n")
 
     # id -> адреса (для каталогу, головної, кошика, старого product.html)
@@ -1045,11 +1102,13 @@ def main():
         f.write("User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n" % SITE_URL)
 
     # feed.xml для Google Merchant Center
-    feed_count, feed_skipped = build_feed(products, slugs, depts)
+    feed_count, feed_skipped = build_feed(visible, slugs, depts)
     if feed_skipped:
         print("Увага: у фід не потрапили товари без ціни або фото: %s" % ", ".join(feed_skipped))
 
     print("Створено сторінок товарів: %d (з ціною: %d, без ціни: %d)" % (len(products), priced, len(products) - priced))
+    if len(visible) != len(products):
+        print("Приховано (немає в наявності): %d — %s" % (len(products) - len(visible), ", ".join(x for x in products if x not in visible)))
     print("feed.xml (Google Merchant Center): %d товарів" % feed_count)
     print("Сторінок брендів: %d, відділів: %d" % (len(brand_pages), len(dept_pages)))
     print("Оновлено файлів із навігаційними посиланнями: %d" % nav_changed)
