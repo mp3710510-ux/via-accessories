@@ -74,6 +74,10 @@ FEED_NS = "http://base.google.com/ns/1.0"
 FEED_TITLE = "via.accessories"
 FEED_DESCRIPTION = "Каталог товарів via.accessories: сумки та аксесуари. Доставка по Україні та Європі."
 FEED_AVAILABILITY = "in_stock"       # in_stock / out_of_stock / preorder (для всіх товарів фіду)
+# Окремі заголовки й атрибути для Google (feed_meta.py): g:title «Жіноча сумка Бренд Модель матеріал колір»,
+# категорія за типом товару, g:color, g:material, g:gender, g:age_group. На сайт (сторінки) не впливає.
+# Список заголовків погоджено (via-admin/docs/feed_titles.csv). Вимкнути — False (тоді фід як раніше).
+FEED_GOOGLE_META = True
 # Категорії Google Product Taxonomy за відділами сайту (https://www.google.com/basepages/producttype/taxonomy.en-US.txt)
 GOOGLE_CATEGORY = {
     "bags": "Apparel & Accessories > Handbags, Wallets & Cases > Handbags",     # id 6551
@@ -950,6 +954,15 @@ def write(path, text):
         f.write(text)
 
 
+def load_feed_meta():
+    """feed_meta.py поруч із цим файлом (працює і коли build_pages.py імпортує адмінка)."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("feed_meta", os.path.join(ROOT, "feed_meta.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 def build_feed(products, slugs, depts):
     """feed.xml для Google Merchant Center (RSS 2.0 + g:). Один item на кожну сторінку товару;
     дані ті самі, що й на сторінках (products.js), тому фід і сайт не розходяться.
@@ -963,6 +976,7 @@ def build_feed(products, slugs, depts):
     ET.SubElement(ch, "link").text = SITE_URL
     ET.SubElement(ch, "description").text = FEED_DESCRIPTION
     count, skipped = 0, []
+    fm = load_feed_meta() if FEED_GOOGLE_META else None
     for pid, p in products.items():
         num = price_number(p)
         images = p.get("images") or []
@@ -973,9 +987,10 @@ def build_feed(products, slugs, depts):
         has_brand = bool(brand) and brand != "Інше"
         dept = p.get("dept") or ""
         dept_title = depts.get(dept, {}).get("title") or p.get("category") or dept
+        meta = fm.final(p, dept_title) if fm else None
         it = ET.SubElement(ch, "item")
         ET.SubElement(it, g("id")).text = slugs[pid]
-        ET.SubElement(it, g("title")).text = trim(full_name_of(p), 150)
+        ET.SubElement(it, g("title")).text = meta["title"] if meta else trim(full_name_of(p), 150)
         ET.SubElement(it, g("description")).text = trim(re.sub(r"<[^>]+>", " ", p.get("description") or full_name_of(p)), 5000)
         ET.SubElement(it, g("link")).text = "%s/products/%s.html" % (SITE_URL, slugs[pid])
         ET.SubElement(it, g("image_link")).text = "%s/%s" % (SITE_URL, url_path(images[0]))
@@ -987,10 +1002,17 @@ def build_feed(products, slugs, depts):
             ET.SubElement(it, g("brand")).text = brand
         ET.SubElement(it, g("condition")).text = "new"
         ET.SubElement(it, g("identifier_exists")).text = "no"
-        cat = GOOGLE_CATEGORY.get(dept)
+        cat = meta["category"] if meta else GOOGLE_CATEGORY.get(dept)
         if cat:
             ET.SubElement(it, g("google_product_category")).text = cat
         ET.SubElement(it, g("product_type")).text = ("%s > %s" % (dept_title, brand)) if has_brand else dept_title
+        if meta:                                       # атрибути з feed_meta.py (невідомі — не вигадуємо)
+            if meta["color"]:
+                ET.SubElement(it, g("color")).text = meta["color"]
+            if meta["material"]:
+                ET.SubElement(it, g("material")).text = meta["material"]
+            ET.SubElement(it, g("gender")).text = meta["gender"]
+            ET.SubElement(it, g("age_group")).text = "adult"
         count += 1
     ET.indent(rss, space="  ")
     data = ET.tostring(rss, encoding="utf-8", xml_declaration=True)     # байти, переноси рядків завжди LF
