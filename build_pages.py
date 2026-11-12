@@ -35,6 +35,11 @@ build_pages.py — генератор статичних сторінок тов
 
 Усі згенеровані файли можна безпечно перегенерувати: папки products/, brands/, category/
 перед генерацією очищуються від старих *.html (щоб не лишалось сторінок видалених товарів).
+
+Переадресації (redirects.json у корені сайту): {"стара адреса": "нова адреса"}, напр. після
+перейменування бренду {"products/van-cleef-jw0104.html": "products/van-cleef-arpels-jw0104.html"}.
+За старою адресою створюється сторінка-переадресація (meta refresh + canonical на нову адресу);
+у sitemap.xml і feed.xml старої адреси немає.
 """
 import html
 import json
@@ -891,6 +896,49 @@ def clean_dir(path):
             os.remove(os.path.join(path, fn))
 
 
+REDIRECTS_FILE = "redirects.json"
+
+
+def load_redirects():
+    path = os.path.join(ROOT, REDIRECTS_FILE)
+    if not os.path.exists(path):
+        return {}
+    with open(path, encoding="utf8") as f:
+        return json.load(f)
+
+
+def redirect_html(old_rel, new_rel):
+    """Сторінка-переадресація: одразу веде на нову адресу; canonical — нова адреса."""
+    href = os.path.relpath(new_rel, os.path.dirname(old_rel) or ".").replace(os.sep, "/")
+    url = "%s/%s" % (SITE_URL, url_path(new_rel))
+    return (
+        '<!DOCTYPE html>\n<html lang="uk">\n<head>\n<meta charset="UTF-8">\n'
+        '<title>Сторінку перенесено | via.accessories</title>\n'
+        '<link rel="canonical" href="%s">\n'
+        '<meta http-equiv="refresh" content="0; url=%s">\n'
+        '<meta name="viewport" content="width=device-width, initial-scale=1.0">\n'
+        '<script>location.replace(%s + location.search + location.hash);</script>\n'
+        '</head>\n<body>\n<p>Сторінку перенесено: <a href="%s">%s</a></p>\n</body>\n</html>\n'
+        % (esc(url), esc(url_path(href)), json.dumps(url_path(href)), esc(url_path(href)), esc(url))
+    )
+
+
+def write_redirects(generated):
+    """Пише сторінки-переадресації; адресу, за якою вже є справжня сторінка, не чіпає."""
+    made = []
+    for old, new in load_redirects().items():
+        if old in generated:
+            print("Увага: переадресацію %s пропущено — за цією адресою вже є сторінка" % old)
+            continue
+        if new not in generated:
+            print("Увага: переадресація %s -> %s: нової сторінки немає" % (old, new))
+            continue
+        os.makedirs(os.path.dirname(os.path.join(ROOT, old)) or ROOT, exist_ok=True)
+        write(os.path.join(ROOT, old), redirect_html(old, new))
+        made.append(old)
+    return made
+
+
 def full_name_of(p):
     brand = p.get("brand") or ""
     has_brand = bool(brand) and brand != "Інше"
@@ -1062,6 +1110,10 @@ def main():
     hits = "\n".join(hit_card_html(pid, products[pid], slugs[pid], full_names[pid]) for pid in pick_hits(visible))
     inject("index.html", "hits", hits + "\n")
 
+    # старі адреси -> нові (після перейменувань); у sitemap і feed їх немає
+    generated = {"products/%s.html" % slugs[pid] for pid in products} | set(brand_pages.values()) | set(dept_pages.values())
+    redirects = write_redirects(generated)
+
     # id -> адреса (для каталогу, головної, кошика, старого product.html)
     mapping = {pid: "products/%s.html" % slugs[pid] for pid in products}
     with open(os.path.join(ROOT, "assets", "product-urls.js"), "w", encoding="utf8", newline="\n") as f:
@@ -1118,6 +1170,8 @@ def main():
     if dept_pages:
         print("Приклад відділу: %s/%s" % (SITE_URL, next(iter(dept_pages.values()))))
     print("sitemap.xml: %d адрес; robots.txt; assets/product-urls.js" % len(locs))
+    if redirects:
+        print("Переадресацій: %d (%s)" % (len(redirects), ", ".join(redirects)))
 
 
 if __name__ == "__main__":

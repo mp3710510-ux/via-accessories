@@ -1045,18 +1045,32 @@
       <g:product_type>Сумки &gt; Bottega Veneta</g:product_type>
     </item>
     <item>
-      <g:id>van-cleef-jw0104</g:id>
+      <g:id>van-cleef-arpels-jw0104</g:id>
       <g:title>Van Cleef &amp; Arpels Bracelet Sweet Alhambra K18 Yellow Gold</g:title>
       <g:description>Браслет виконаний зі срібла в позолоті. Оригінальний механізм відкриття/закриття. Має маркування бренду, проби, унікальний код. В комплекті захисний картон, брендова текстурна коробка білого кольору кришка-дно. Має оксамитовий чохол в фірмовому кольорі, з брендуванням. Прикраса розміщена на м’якій подушечці. Також в комплекті є пакет та сертифікат якості</g:description>
-      <g:link>https://via-accessories.com.ua/products/van-cleef-jw0104.html</g:link>
+      <g:link>https://via-accessories.com.ua/products/van-cleef-arpels-jw0104.html</g:link>
       <g:image_link>https://via-accessories.com.ua/content/watermarked/%D0%92%D0%BA%201-1.jpg</g:image_link>
       <g:availability>in_stock</g:availability>
       <g:price>3100.00 UAH</g:price>
-      <g:brand>Van Cleef</g:brand>
+      <g:brand>Van Cleef &amp; Arpels</g:brand>
       <g:condition>new</g:condition>
       <g:identifier_exists>no</g:identifier_exists>
       <g:google_product_category>Apparel &amp; Accessories &gt; Jewelry</g:google_product_category>
-      <g:product_type>Прикраси &gt; Van Cleef</g:product_type>
+      <g:product_type>Прикраси &gt; Van Cleef &amp; Arpels</g:product_type>
+    </item>
+    <item>
+      <g:id>van-cleef-arpels-jw0109</g:id>
+      <g:title>Van Cleef &amp; Arpels Pendant Vintage Green Malachite K18 Yellow Gold</g:title>
+      <g:description>Підвіска виконана зі срібла в позолоті.</g:description>
+      <g:link>https://via-accessories.com.ua/products/van-cleef-arpels-jw0109.html</g:link>
+      <g:image_link>https://via-accessories.com.ua/content/watermarked/%D0%92%D0%BA%202-1.jpg</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>3100.00 UAH</g:price>
+      <g:brand>Van Cleef &amp; Arpels</g:brand>
+      <g:condition>new</g:condition>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:google_product_category>Apparel &amp; Accessories &gt; Jewelry</g:google_product_category>
+      <g:product_type>Прикраси &gt; Van Cleef &amp; Arpels</g:product_type>
     </item>
   </channel>
 </rss>
