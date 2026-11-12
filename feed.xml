@@ -1329,5 +1329,23 @@
       <g:gender>female</g:gender>
       <g:age_group>adult</g:age_group>
     </item>
+    <item>
+      <g:id>chrome-hearts-ew1301</g:id>
+      <g:title>Окуляри Chrome Hearts Ambidixtrous чорні</g:title>
+      <g:description>Chrome Hearts Clear/Black AMBIDIXTROUS 50702857 53/21/151</g:description>
+      <g:link>https://via-accessories.com.ua/products/chrome-hearts-ew1301.html</g:link>
+      <g:image_link>https://via-accessories.com.ua/content/watermarked/%D0%9A%D1%85%201-1.jpg</g:image_link>
+      <g:availability>in_stock</g:availability>
+      <g:price>3200.00 UAH</g:price>
+      <g:brand>Chrome Hearts</g:brand>
+      <g:condition>new</g:condition>
+      <g:identifier_exists>no</g:identifier_exists>
+      <g:google_product_category>Apparel &amp; Accessories &gt; Clothing Accessories &gt; Sunglasses</g:google_product_category>
+      <g:product_type>Окуляри &gt; Chrome Hearts</g:product_type>
+      <g:color>чорний</g:color>
+      <g:material>пластик/полікарбонат</g:material>
+      <g:gender>unisex</g:gender>
+      <g:age_group>adult</g:age_group>
+    </item>
   </channel>
 </rss>

@@ -993,8 +993,19 @@ def build_feed(products, slugs, depts):
         ET.SubElement(it, g("title")).text = meta["title"] if meta else trim(full_name_of(p), 150)
         ET.SubElement(it, g("description")).text = trim(re.sub(r"<[^>]+>", " ", p.get("description") or full_name_of(p)), 5000)
         ET.SubElement(it, g("link")).text = "%s/products/%s.html" % (SITE_URL, slugs[pid])
-        ET.SubElement(it, g("image_link")).text = "%s/%s" % (SITE_URL, url_path(images[0]))
-        for extra in images[1:11]:
+        # головне фото лише для Google (погоджене в адмінці): «фото для Google» (content/google) -> packshot на
+        # білому фоні (content/packshot) -> звичайне фото; фото сайту йдуть додатковими. На сторінки не впливає.
+        main_image = None
+        for path, ok in ((p.get("googlePhoto"), p.get("googlePhotoApproved")), (p.get("packshot"), p.get("packshotApproved"))):
+            if path and ok and os.path.exists(os.path.join(ROOT, path)):
+                main_image = path
+                break
+        if main_image:
+            extra_images = images[:10]
+        else:
+            main_image, extra_images = images[0], images[1:11]
+        ET.SubElement(it, g("image_link")).text = "%s/%s" % (SITE_URL, url_path(main_image))
+        for extra in extra_images:
             ET.SubElement(it, g("additional_image_link")).text = "%s/%s" % (SITE_URL, url_path(extra))
         ET.SubElement(it, g("availability")).text = FEED_AVAILABILITY
         ET.SubElement(it, g("price")).text = "%.2f %s" % (num, CURRENCY)
