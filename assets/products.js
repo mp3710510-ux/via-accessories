@@ -249,6 +249,10 @@ var PRODUCTS = {
         images:["content/watermarked/Ш 21-1.jpg","content/watermarked/Ш 21-2.jpg","content/watermarked/Ш 21-3.jpg"], video:"content/watermarked/Ш 21-4.mp4",
         description:"Сумка Chanel Classic 25 Flap Caviar Blue with Gold Hardware. Матеріал — шкіра. Повний комплект.",
         specs:{"Розмір":"25х16х7","Матеріал":"шкіра","Комплект":"Повний комплект"} },
+    "Ш-22": { dept:"bags", category:"Сумки", brand:"Chanel", name:"Новинка", price:"5000 грн", code:"3937",
+        images:["content/watermarked/Ш 22-1.jpg"], video:null,
+        description:"Сумка Chanel Новинка. Матеріал — шкіра. Розмір — 20х16,5х5. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Розмір":"20х16,5х5","Матеріал":"Шкіра","Колір":"Green","Фурнітура":"Уточнювати у менеджера"} },
 
     "Д-1": { dept:"bags", category:"Сумки", brand:"Dior", name:"Saddle Bag Toile de Jouy Pink", price:"6200 грн", code:"6391",
         images:["content/watermarked/Д 1-1.jpg","content/watermarked/Д 1-2.jpg","content/watermarked/Д 1-3.jpg"], video:"content/watermarked/Д 1-4.mp4",
