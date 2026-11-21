@@ -250,7 +250,7 @@ var PRODUCTS = {
         description:"Сумка Chanel Classic 25 Flap Caviar Blue with Gold Hardware. Матеріал — шкіра. Повний комплект.",
         specs:{"Розмір":"25х16х7","Матеріал":"шкіра","Комплект":"Повний комплект"} },
     "Ш-22": { dept:"bags", category:"Сумки", brand:"Chanel", name:"Новинка", price:"5000 грн", code:"3937",
-        images:["content/watermarked/Ш 22-1.jpg"], video:null,
+        images:["content/watermarked/Ш 22-1.jpg"], video:"content/watermarked/Ш 22-4.mp4",
         description:"Сумка Chanel Новинка. Матеріал — шкіра. Розмір — 20х16,5х5. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         specs:{"Розмір":"20х16,5х5","Матеріал":"Шкіра","Колір":"Green","Фурнітура":"Уточнювати у менеджера"} },
 
