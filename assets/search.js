@@ -124,10 +124,11 @@ var SearchCore = (function () {
         return out;
     }
 
-    var ITEMS = [], VOCAB = [], SHOW = {};
+    var ITEMS = [], VOCAB = [], SHOW = {}, PRESENT = {}, WORDS = {};
     function setIndex(rows) {
         var vocab = {};
         SHOW = {};
+        PRESENT = {};                                    // бренди, що є серед товарів (фонетичні слова через пробіл)
         ITEMS = (rows || []).map(function (it, i) {
             var e = {
                 it: it, i: i,
@@ -143,9 +144,11 @@ var SearchCore = (function () {
                 });
             });
             e.brand.concat(e.name, e.rest).forEach(function (w) { vocab[w] = 1; });
+            if (e.brand.length) PRESENT[e.brand.join(' ')] = 1;
             return e;
         });
         VOCAB = Object.keys(vocab);
+        WORDS = vocab;                                   // цілі слова товарів: «gold» — слово, а не початок «golden goose»
     }
 
     function hasPrefix(list, t) {
@@ -153,16 +156,50 @@ var SearchCore = (function () {
         return false;
     }
 
-    /* запит -> слова з урахуванням словника; кожне слово: {q, any?, show, changed, fuzzy?} */
+    /* автодоповнення: написання зі словника, що ПОЧИНАЮТЬСЯ з фрази («ша» -> шанель -> Chanel, «ch» -> Chanel,
+       Chrome Hearts). Бренди — з 2 літер і лише ті, що є серед товарів; типи — з 3 літер («сум» -> сумка). */
+    function prefixAlias(phrase, single) {
+        var flat = phrase.replace(/ /g, '');
+        if (flat.length < 2 || /\d/.test(flat)) return null;
+        var brands = [], seen = {}, types = [], tseen = {};
+        Object.keys(ALIAS).forEach(function (k) {
+            if (k.indexOf(phrase) !== 0) return;
+            var v = ALIAS[k];
+            if (v.q) {
+                var key = v.q.join(' ');
+                if (PRESENT[key] && !seen[key]) { seen[key] = 1; brands.push(v); }
+            } else if (single && flat.length >= 3 && !tseen[v.show]) {
+                tseen[v.show] = 1; types.push(v);
+            }
+        });
+        if (brands.length) {
+            return { brands: brands.map(function (v) { return v.q.join(' '); }),
+                     show: brands.map(function (v) { return v.show; }).join(' / '), changed: true, brand: true };
+        }
+        if (types.length) {
+            return { any: [].concat.apply([], types.map(function (v) { return v.any; })), show: types[0].show, changed: false };
+        }
+        return null;
+    }
+
+    /* запит -> слова з урахуванням словника; кожне слово: {q, any?, brands?, show, changed, fuzzy?} */
     function parse(q) {
         var raw = base(q).split(' ').filter(Boolean);
         var toks = raw.map(function (w) { return { q: phon(w), show: w, changed: false }; });
         var out = [];
         for (var i = 0; i < toks.length;) {
-            var hit = null, len = 0;
-            for (var L = Math.min(MAXLEN, toks.length - i); L >= 1 && !hit; L--) {
-                var key = toks.slice(i, i + L).map(function (t) { return t.q; }).join(' ');
+            var hit = null, len = 0, L, key;
+            for (L = Math.min(MAXLEN, toks.length - i); L >= 1 && !hit; L--) {
+                key = toks.slice(i, i + L).map(function (t) { return t.q; }).join(' ');
                 if (ALIAS[key]) { hit = ALIAS[key]; len = L; }
+            }
+            if (!hit && !WORDS[toks[i].q]) {          // ціле слово з товарів («gold») — це не початок бренду
+                for (L = Math.min(MAXLEN, toks.length - i); L >= 1 && !hit; L--) {
+                    key = toks.slice(i, i + L).map(function (t) { return t.q; }).join(' ');
+                    var pf = prefixAlias(key, L === 1);
+                    if (pf) { out.push(pf); i += L; hit = true; }
+                }
+                if (hit) continue;
             }
             if (!hit) { out.push(toks[i]); i++; continue; }
             var typed = raw.slice(i, i + len).join(' ');
@@ -182,9 +219,18 @@ var SearchCore = (function () {
     }
 
     function matchWord(e, t) {
-        /* вага збігу слова t у товарі e (0 — немає) */
-        if (e.code && e.code === t) return 50;
-        if (e.code && /\d/.test(t) && e.code.indexOf(t) === 0) return 20;
+        /* вага збігу слова t у товарі e (0 — немає): ціле слово > початок слова.
+           Цифри: код — точно або за початком від 3 цифр; число в назві («25») — лише ціле.
+           Слова з 1–2 літер — лише цілі (за початком від 3 символів). */
+        if (/\d/.test(t)) {
+            if (e.code && e.code === t) return 50;
+            if (e.code && t.length >= 3 && e.code.indexOf(t) === 0) return 20;
+            return e.name.indexOf(t) >= 0 ? 5 : 0;
+        }
+        if (e.brand.indexOf(t) >= 0) return 12;
+        if (e.name.indexOf(t) >= 0) return 9;
+        if (e.rest.indexOf(t) >= 0) return 4;
+        if (t.length < 3) return 0;
         if (hasPrefix(e.brand, t)) return 8;
         if (hasPrefix(e.name, t)) return 5;
         if (hasPrefix(e.rest, t)) return 2;
@@ -220,7 +266,9 @@ var SearchCore = (function () {
             var score = 0;
             for (var k = 0; k < toks.length; k++) {
                 var t = toks[k], hit = 0, j;
-                if (t.any) {
+                if (t.brands) {                       // бренд за початком написання — збіг з брендом товару
+                    hit = t.brands.indexOf(e.brand.join(' ')) >= 0 ? 8 : 0;
+                } else if (t.any) {
                     for (j = 0; j < t.any.length && !hit; j++) {
                         var ws = t.any[j].split(' '), all = 1, sum = 0;
                         ws.forEach(function (w) { var m = matchWord(e, w); if (!m) all = 0; sum += m; });
