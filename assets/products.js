@@ -278,6 +278,10 @@ var PRODUCTS = {
         images:["content/watermarked/Д 6-1.jpg","content/watermarked/Д 6-2.jpg","content/watermarked/Д 6-3.jpg"], video:"content/watermarked/Д 6-4.mp4",
         description:"Сумка Dior Lady D-Joy Bag Mint Gray with Gold. Матеріал — шкіра. Повний комплект.",
         specs:{"Розмір":"22х11","Матеріал":"шкіра","Комплект":"Повний комплект"} },
+    "Д-7": { dept:"accessories", category:"Аксесуари", brand:"Dior", name:"Сервіз Dior", price:"4500 грн", code:"9754",
+        images:["content/watermarked/Д 7-1.jpg","content/watermarked/Д 7-2.jpg","content/watermarked/Д 7-3.jpg"], video:null,
+        description:"2 чашки та 2 блюдце Коробка як на фото. Аксесуар Dior Сервіз Dior. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
     "Дг-1": { dept:"bags", category:"Сумки", brand:"Dolce & Gabbana", name:"Mini Sicily Green Patent Leather", price:"4500 грн", code:"92261",
         images:["content/watermarked/Дг 1-1.jpg","content/watermarked/Дг 1-2.jpg","content/watermarked/Дг 1-3.jpg"], video:"content/watermarked/Дг 1-4.mp4",
