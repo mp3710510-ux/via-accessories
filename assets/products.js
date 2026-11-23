@@ -451,11 +451,11 @@ var PRODUCTS = {
         description:"Окуляри Tom Ford. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
     "Тф-2": { dept:"eyewear", category:"Окуляри", brand:"Tom Ford", name:"Окуляри", price:"3500 грн", code:"4323",
-        images:["content/watermarked/Тф 2-1.jpg","content/watermarked/Тф 2-2.jpg","content/watermarked/Тф 2-3.jpg","content/watermarked/Тф 2-4.jpg","content/watermarked/Тф 2-5.jpg","content/watermarked/Тф 2-6.jpg"], video:null,
+        images:["content/watermarked/Тф 2-2.jpg","content/watermarked/Тф 2-1.jpg","content/watermarked/Тф 2-3.jpg","content/watermarked/Тф 2-4.jpg","content/watermarked/Тф 2-5.jpg","content/watermarked/Тф 2-6.jpg"], video:null,
         description:"Пакування: коробка,футляр,мікрофібра. Окуляри Tom Ford. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
     "Тф-3": { dept:"eyewear", category:"Окуляри", brand:"Tom Ford", name:"Окуляри", price:"3500 грн", code:"4324",
-        images:["content/watermarked/Тф 3-1.jpg","content/watermarked/Тф 3-2.jpg","content/watermarked/Тф 3-3.jpg","content/watermarked/Тф 3-4.jpg","content/watermarked/Тф 3-5.jpg","content/watermarked/Тф 3-6.jpg"], video:null,
+        images:["content/watermarked/Тф 3-3.jpg","content/watermarked/Тф 3-1.jpg","content/watermarked/Тф 3-2.jpg","content/watermarked/Тф 3-4.jpg","content/watermarked/Тф 3-5.jpg","content/watermarked/Тф 3-6.jpg"], video:null,
         description:"Окуляри Tom Ford. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
