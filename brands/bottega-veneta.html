@@ -50,6 +50,11 @@
 .brand-tile-image.is-logo{padding:12%}
 .brand-tile-image.is-logo img{object-fit:contain;mix-blend-mode:multiply}
 .brand-tile:hover .brand-tile-image.is-logo img{transform:scale(1.02)}
+/* Бренд без логотипа — текстова плитка: назва шрифтом сайту на кремовому фоні, того ж розміру */
+.brand-tile-image.is-text{padding:10%;container-type:inline-size}
+.brand-tile-word{display:block;text-align:center;font-family:'Cormorant Garamond',serif;font-weight:400;font-size:22px;font-size:clamp(15px,10.5cqi,30px);line-height:1.25;letter-spacing:0.14em;text-transform:uppercase;color:#1c1a17;transition:color 0.4s}
+.brand-tile-word::after{content:"";display:block;width:28px;height:1px;margin:0.55em auto 0;background:var(--color-gold)}
+.brand-tile:hover .brand-tile-word{color:var(--color-gold)}
 .brand-tile-name{text-align:center;padding:20px 16px 0;font-family:'Cormorant Garamond',serif;font-size:18px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a}
 .catalog-empty{text-align:center;padding:60px 20px;color:#6b6258}
 .catalog-empty p{font-size:15px;margin-bottom:26px}

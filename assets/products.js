@@ -517,21 +517,24 @@ function getAllProducts() {
     return out;
 }
 
-/* Список унікальних брендів у відділі, з фото-обкладинкою (перше фото
-   першого товару цього бренду). Використовується для сторінки
-   "Каталог -> Відділ -> бренди" перед показом самих товарів. */
+/* Список унікальних брендів у відділі з логотипом для плитки. Логотип — з BRAND_TILE_LOGOS
+   (assets/product-urls.js, генерує build_pages.py: assets/brands/<slug>.svg|png або BRAND_LOGOS).
+   Логотипа немає -> cover порожній, плитка текстова (назва бренду), фото товару не ставимо.
+   Використовується для сторінки "Каталог -> Відділ -> бренди" перед показом самих товарів. */
 function getBrandsByDept(deptKey) {
     var items = getProductsByDept(deptKey);
     var seen = {};
     var out = [];
+    var own = Object.prototype.hasOwnProperty;
+    var tileLogos = (typeof BRAND_TILE_LOGOS === "undefined") ? {} : BRAND_TILE_LOGOS;
     items.forEach(function (p) {
         var b = p.brand || "Інше";
         if (!seen[b]) {
             seen[b] = true;
-            var logo = Object.prototype.hasOwnProperty.call(BRAND_LOGOS, b) ? BRAND_LOGOS[b] : "";
+            var logo = own.call(tileLogos, b) ? tileLogos[b] : (own.call(BRAND_LOGOS, b) ? BRAND_LOGOS[b] : "");
             out.push({
                 brand: b,
-                cover: logo || ((p.images && p.images.length) ? p.images[0] : ""),
+                cover: logo,
                 isLogo: !!logo
             });
         }

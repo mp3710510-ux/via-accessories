@@ -14,7 +14,9 @@ build_pages.py — генератор статичних сторінок тов
     або змінених файлів; оригінали не чіпає. Для цього потрібні Pillow і ffmpeg;
   * стискає відео (H.264, ~720p, CRF 26) з content/watermarked у content/optimized/video/ — сайт бере їх звідти;
   * створює brands/<бренд>.html — сторінку кожного бренду, що має товари;
-  * створює category/<відділ>.html — сторінку кожного відділу, що має товари;
+  * створює category/<відділ>.html — сторінку кожного відділу, що має товари (плитки брендів: логотип
+    assets/brands/<slug бренду>.svg|.png або BRAND_LOGOS з products.js; логотипа немає — текстова плитка);
+  * створює category/<відділ>/<бренд>.html — товари бренду в цьому відділі (лише пари з видимими товарами);
   * виставляє посилання на відділи/бренди в шапці, підвалах і на головній (атрибути data-dept /
     data-brand): є сторінка — веде на неї, ще немає — на catalog.html?...;
   * створює assets/product-urls.js — відповідність id товару -> адреса сторінки
@@ -943,18 +945,33 @@ def brand_sections_html(brand, items, depts, dept_brand_pages, slugs, full_names
     return "\n".join(out) + "\n" + (BRAND_FILTER_JS if len(groups) > 1 else "")
 
 
+LOGO_DIR = "assets/brands"     # логотипи брендів: assets/brands/<slug бренду>.svg або .png (напр. gucci.png)
+
+
+def brand_logo(brand, logos):
+    """Логотип бренду: файл assets/brands/<slug>.svg|.png, інакше BRAND_LOGOS з products.js; немає — None."""
+    for ext in ("svg", "png"):
+        rel = "%s/%s.%s" % (LOGO_DIR, slugify(brand), ext)
+        if os.path.exists(os.path.join(ROOT, rel)):
+            return rel
+    return logos.get(brand) or None
+
+
 def brand_tiles_html(brands, brand_pages, logos, items):
-    """Плитки брендів (логотип або фото першого товару), як у каталозі — для сторінки відділу.
+    """Плитки брендів для сторінки відділу: логотип (як у каталозі), а якщо логотипа немає —
+    текстова плитка з назвою бренду (фото товару на плитку не ставимо).
     brand_pages — куди веде плитка (на сторінці відділу — сторінки «відділ + бренд»)."""
     tiles = []
     for i, b in enumerate(brands):
-        logo = logos.get(b)
-        cover = logo or next((p["images"][0] for _, p in items if p.get("brand") == b and p.get("images")), "")
+        logo = brand_logo(b, logos)
+        if logo:
+            inner = '<div class="brand-tile-image is-logo">%s</div>' % picture_html(
+                logo, b, TILE_SIZES, "../", "eager" if i < 5 else "lazy")
+        else:
+            inner = '<div class="brand-tile-image is-text"><span class="brand-tile-word">%s</span></div>' % esc(b)
         tiles.append(
-            '<a class="brand-tile" href="../%s"><div class="brand-tile-image%s">%s</div>'
-            '<div class="brand-tile-name">%s</div></a>'
-            % (brand_pages[b], " is-logo" if logo else "",
-               picture_html(cover, b, TILE_SIZES, "../", "eager" if i < 5 else "lazy"), esc(b))
+            '<a class="brand-tile" href="../%s">%s<div class="brand-tile-name">%s</div></a>'
+            % (brand_pages[b], inner, esc(b))
         )
     if not tiles:
         return ""
@@ -1344,6 +1361,9 @@ def main():
         f.write("var PRODUCT_URLS = %s;\n" % json.dumps(mapping, ensure_ascii=False, indent=2))
         f.write("var BRAND_URLS = %s;\n" % json.dumps(brand_pages, ensure_ascii=False, indent=2))
         f.write("var DEPT_URLS = %s;\n" % json.dumps(dept_pages, ensure_ascii=False, indent=2))
+        tile_logos = {b: brand_logo(b, logos) for b in brand_pages if brand_logo(b, logos)}
+        f.write("/* Логотипи для плиток брендів (assets/brands/<slug>.svg|png або BRAND_LOGOS); немає — текстова плитка */\n")
+        f.write("var BRAND_TILE_LOGOS = %s;\n" % json.dumps(tile_logos, ensure_ascii=False, indent=2))
         compact = {k: [m["w"], m["h"], m["s"]] for k, m in IMG_META.items() if k.startswith("content/")}
         f.write("/* Оптимізовані копії фото: шлях -> [ширина, висота, [ширини WebP]] */\n")
         f.write("var IMG_META = %s;\n" % json.dumps(compact, ensure_ascii=False, separators=(",", ":")))

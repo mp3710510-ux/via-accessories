@@ -47,6 +47,9 @@ _type(["belt bag", "waist bag", "поясна сумка"], "поясна сум
 _type(["backpack", "рюкзак"], "рюкзак", "ч", CAT_BACKPACKS)
 _type(["clutch", "клатч"], "клатч", "ч", CAT_HANDBAGS)
 _type(["wallet", "гаманець"], "гаманець", "ч", CAT_WALLETS)
+# Wallet on Chain (WOC) — сумка на ланцюжку, а не гаманець; слова лишаються в назві моделі (KEEP_IN_MODEL)
+_type(["wallet on chain", "wallet on a chain", "woc"], "сумка", "ж", CAT_HANDBAGS)
+KEEP_IN_MODEL = {"wallet on chain", "wallet on a chain", "woc"}
 _type(["card holder", "cardholder", "картхолдер"], "картхолдер", "ч", CAT_WALLETS)
 _type(["belt", "ремінь"], "ремінь", "ч", CAT_BELTS)
 _type(["scarf", "хустка"], "хустка", "ж", CAT_SCARVES)
@@ -233,7 +236,7 @@ def analyse_name(name, dept, code="", brand=""):
     low = [_norm(t) for t in toks]
     while i < len(toks):
         hit = None
-        for n in (3, 2, 1):
+        for n in (4, 3, 2, 1):                      # «wallet on a chain» — 4 слова
             if i + n > len(toks):
                 continue
             ph = " ".join(low[i:i + n])
@@ -256,6 +259,8 @@ def analyse_name(name, dept, code="", brand=""):
             kind, n, val = hit
             if kind == "type" and typ is None:
                 typ = val
+            if kind == "type" and " ".join(low[i:i + n]) in KEEP_IN_MODEL:
+                keep += toks[i:i + n]
             elif kind == "mat":
                 mats.append(val)
             elif kind == "metal":

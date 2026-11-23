@@ -50,6 +50,11 @@
 .brand-tile-image.is-logo{padding:12%}
 .brand-tile-image.is-logo img{object-fit:contain;mix-blend-mode:multiply}
 .brand-tile:hover .brand-tile-image.is-logo img{transform:scale(1.02)}
+/* Бренд без логотипа — текстова плитка: назва шрифтом сайту на кремовому фоні, того ж розміру */
+.brand-tile-image.is-text{padding:10%;container-type:inline-size}
+.brand-tile-word{display:block;text-align:center;font-family:'Cormorant Garamond',serif;font-weight:400;font-size:22px;font-size:clamp(15px,10.5cqi,30px);line-height:1.25;letter-spacing:0.14em;text-transform:uppercase;color:#1c1a17;transition:color 0.4s}
+.brand-tile-word::after{content:"";display:block;width:28px;height:1px;margin:0.55em auto 0;background:var(--color-gold)}
+.brand-tile:hover .brand-tile-word{color:var(--color-gold)}
 .brand-tile-name{text-align:center;padding:20px 16px 0;font-family:'Cormorant Garamond',serif;font-size:18px;letter-spacing:3px;text-transform:uppercase;color:#1a1a1a}
 .catalog-empty{text-align:center;padding:60px 20px;color:#6b6258}
 .catalog-empty p{font-size:15px;margin-bottom:26px}
@@ -148,7 +153,7 @@
 <div class="brand-grid brand-tiles">
 <a class="brand-tile" href="../category/aksesuary/chanel.html"><div class="brand-tile-image is-logo"><picture><source type="image/webp" srcset="../content/optimized/%D0%9B%D0%BE%D0%B3%D0%BE%20%D0%A8-240.webp 240w, ../content/optimized/%D0%9B%D0%BE%D0%B3%D0%BE%20%D0%A8-480.webp 480w, ../content/optimized/%D0%9B%D0%BE%D0%B3%D0%BE%20%D0%A8-800.webp 800w, ../content/optimized/%D0%9B%D0%BE%D0%B3%D0%BE%20%D0%A8-1000.webp 1000w" sizes="(max-width:900px) 50vw, 20vw"><img src="../content/watermarked/%D0%9B%D0%BE%D0%B3%D0%BE%20%D0%A8.jpg" width="1000" height="1000" alt="Chanel" decoding="async"></picture></div><div class="brand-tile-name">Chanel</div></a>
 <a class="brand-tile" href="../category/aksesuary/dior.html"><div class="brand-tile-image is-logo"><picture><source type="image/webp" srcset="../content/optimized/%D0%9B%D0%BE%D0%B3%D0%BE%20%D0%94-240.webp 240w, ../content/optimized/%D0%9B%D0%BE%D0%B3%D0%BE%20%D0%94-480.webp 480w, ../content/optimized/%D0%9B%D0%BE%D0%B3%D0%BE%20%D0%94-800.webp 800w, ../content/optimized/%D0%9B%D0%BE%D0%B3%D0%BE%20%D0%94-1000.webp 1000w" sizes="(max-width:900px) 50vw, 20vw"><img src="../content/watermarked/%D0%9B%D0%BE%D0%B3%D0%BE%20%D0%94.jpg" width="1000" height="1000" alt="Dior" decoding="async"></picture></div><div class="brand-tile-name">Dior</div></a>
-<a class="brand-tile" href="../category/aksesuary/gucci.html"><div class="brand-tile-image"><picture><source type="image/webp" srcset="../content/optimized/%D0%93%D1%87%201-1-240.webp 240w, ../content/optimized/%D0%93%D1%87%201-1-480.webp 480w, ../content/optimized/%D0%93%D1%87%201-1-720.webp 720w" sizes="(max-width:900px) 50vw, 20vw"><img src="../content/watermarked/%D0%93%D1%87%201-1.jpg" width="720" height="1280" alt="Gucci" decoding="async"></picture></div><div class="brand-tile-name">Gucci</div></a>
+<a class="brand-tile" href="../category/aksesuary/gucci.html"><div class="brand-tile-image is-text"><span class="brand-tile-word">Gucci</span></div><div class="brand-tile-name">Gucci</div></a>
 </div>
 </div>
 
