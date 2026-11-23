@@ -441,6 +441,72 @@ def brand_dept_phrase(dept_titles, lower):
     return phrase if lower else phrase[:1].upper() + phrase[1:]
 
 
+def videos_of(p):
+    """Усі відео товару: videos (нові товари), а для старих — [video]."""
+    if p.get("videos"):
+        return list(p["videos"])
+    return [p["video"]] if p.get("video") else []
+
+
+# Галерея з багатьма медіа (більше за «3 фото + 1 відео»): мініатюри переносяться (ПК) або гортаються стрічкою
+# (телефон), лічильник «3 / 8», стрілки, свайп по головному фото і в лайтбоксі. Лише на таких сторінках.
+MANY_MEDIA_CSS = (
+    ".gallery{min-width:0}.gallery-thumbs{position:relative;max-width:100%}\n"
+    ".gallery-count{position:absolute;right:12px;bottom:12px;background:rgba(28,26,23,0.62);color:#f5f1ea;font-size:11px;"
+    "letter-spacing:2px;padding:5px 9px;border-radius:2px;pointer-events:none}\n"
+    ".gallery-arrow{position:absolute;top:50%;transform:translateY(-50%);width:40px;height:40px;border:0;border-radius:50%;"
+    "background:rgba(245,241,234,0.85);color:#1c1a17;font-size:20px;line-height:40px;cursor:pointer;opacity:0;"
+    "transition:opacity 0.3s;z-index:2}\n"
+    ".gallery-arrow.prev{left:12px}.gallery-arrow.next{right:12px}\n"
+    ".gallery-main:hover .gallery-arrow{opacity:1}\n"
+    "@media (hover:none){.gallery-arrow{display:none}}\n"
+    "@media (max-width:500px){.gallery-thumbs{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;"
+    "-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:10px;padding-bottom:2px}"
+    ".gallery-thumbs::-webkit-scrollbar{display:none}"
+    ".gallery-thumbs .thumb{flex:0 0 calc((100% - 30px) / 3.4);scroll-snap-align:start}}\n"
+)
+MANY_MEDIA_JS = """<script>
+(function () {
+    var items = galleryItems, strip = galleryThumbs, th = strip.querySelectorAll('.thumb');
+    if (items.length < 2) return;
+    var count = document.createElement('div'); count.className = 'gallery-count';
+    var prev = document.createElement('button'); prev.type = 'button'; prev.className = 'gallery-arrow prev'; prev.setAttribute('aria-label', 'Попереднє'); prev.textContent = '‹';
+    var next = document.createElement('button'); next.type = 'button'; next.className = 'gallery-arrow next'; next.setAttribute('aria-label', 'Наступне'); next.textContent = '›';
+    function decorate() {
+        count.textContent = (currentIndex + 1) + ' / ' + items.length;
+        galleryMain.appendChild(count); galleryMain.appendChild(prev); galleryMain.appendChild(next);
+        var t = th[currentIndex];
+        if (t && strip.scrollWidth > strip.clientWidth) strip.scrollTo({ left: t.offsetLeft - (strip.clientWidth - t.offsetWidth) / 2, behavior: 'smooth' });
+    }
+    var baseShow = showMain;
+    showMain = function (i) { baseShow(i); decorate(); };
+    function go(i) {
+        i = (i + items.length) % items.length;
+        for (var j = 0; j < th.length; j++) th[j].classList.toggle('active', j === i);
+        currentIndex = i;
+        showMain(i);
+    }
+    prev.addEventListener('click', function (e) { e.stopPropagation(); go(currentIndex - 1); });
+    next.addEventListener('click', function (e) { e.stopPropagation(); go(currentIndex + 1); });
+    function swipe(el, step) {
+        var x0 = null, y0 = 0, moved = false;
+        el.addEventListener('touchstart', function (e) { var t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; moved = false; }, { passive: true });
+        el.addEventListener('touchend', function (e) {
+            if (x0 === null) return;
+            var t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+            x0 = null;
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) { moved = true; step(dx < 0 ? 1 : -1); }
+        });
+        el.addEventListener('click', function (e) { if (moved) { moved = false; e.stopImmediatePropagation(); e.preventDefault(); } }, true);
+    }
+    swipe(galleryMain, function (d) { go(currentIndex + d); });
+    swipe(lightboxContent, function (d) { lightboxStep(d); });
+    decorate();
+})();
+</script>
+"""
+
+
 # Стилі додаються на сторінку лише тоді, коли потрібні (інші сторінки лишаються без змін)
 STOCK_OUT_CSS = (
     ".stock-out{display:inline-block;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#1c1a17;"
@@ -480,7 +546,10 @@ def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages, similar_html="
     price_text = (p.get("price") or "").strip() if num is not None else ""
     code = str(p.get("code") or "")
     images = p.get("images") or []
-    video = p.get("video") or None
+    videos = videos_of(p)
+    video = videos[0] if videos else None
+    # більше медіа, ніж старі «3 фото + 1 відео» — галерея з гортанням/свайпом (старі сторінки не змінюються)
+    many = len(images) > 3 or len(videos) > 1
     specs = p.get("specs") or {}
     hidden = bool(p.get("hidden"))
 
@@ -578,21 +647,26 @@ def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages, similar_html="
             '<div class="thumb%s" data-index="%d">%s</div>'
             % (" active" if idx == 0 else "", idx, picture_html(src, full_name, THUMB_SIZES, "../", "lazy"))
         )
-    if video:
-        pm = POSTER_META.get(video)
+    for v in videos:
+        pm = POSTER_META.get(v)
         gallery.append({
-            "type": "video", "src": "../" + url_path(VIDEO_OUT.get(video, video)),
+            "type": "video", "src": "../" + url_path(VIDEO_OUT.get(v, v)),
             "poster": ("../" + url_path(pm["p"])) if pm else "",
             "w": pm["w"] if pm else 0, "h": pm["h"] if pm else 0,
         })
-        cover = picture_html(images[0], full_name, THUMB_SIZES, "../", "lazy") if images else ""
-        thumbs.append('<div class="thumb video-thumb" data-index="%d">%s</div>' % (len(images), cover))
+        if many and pm:                               # кілька відео — кожне зі своєю обкладинкою
+            cover = '<img src="../%s" alt="%s" loading="lazy" decoding="async">' % (url_path(pm["p"]), esc(full_name))
+        else:
+            cover = picture_html(images[0], full_name, THUMB_SIZES, "../", "lazy") if images else ""
+        thumbs.append('<div class="thumb video-thumb" data-index="%d">%s</div>' % (len(gallery) - 1, cover))
 
     price_block = '<div class="price" id="productPrice">%s</div>\n' % esc(price_text) if num is not None else ""
     extra_css = ""
     if hidden:
         price_block += '<div class="stock-out">Немає в наявності</div>\n'
         extra_css += STOCK_OUT_CSS
+    if many:
+        extra_css += MANY_MEDIA_CSS
     long_html = long_desc_html(p.get("longDescription") or "")
     if long_html:
         extra_css += LONG_DESC_CSS
@@ -617,6 +691,8 @@ def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages, similar_html="
         "video": VIDEO_OUT.get(video, video),
         "gallery": gallery,
     }
+    if many:
+        product_js["videos"] = [VIDEO_OUT.get(v, v) for v in videos]
     product_json = json.dumps(product_js, ensure_ascii=False).replace("</", "<\\/")
 
     repl = {
@@ -644,6 +720,7 @@ def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages, similar_html="
         "SIMILAR_JSON": similar_json,
         "EXTRA_CSS": ('<style>\n%s</style>\n' % extra_css) if extra_css else "",
         "LONG_DESC": long_html,
+        "EXTRA_JS": MANY_MEDIA_JS if many else "",
     }
     out = tpl
     for k, v in repl.items():
@@ -1053,7 +1130,7 @@ def main():
         photo_sources += [i for i in (p.get("images") or []) if i not in photo_sources]
     photo_sources += [l for l in logos.values() if l not in photo_sources]
     photo_sources += [sl for sl in SLIDES if os.path.exists(os.path.join(ROOT, sl))]
-    videos = sorted({p["video"] for p in products.values() if p.get("video")})
+    videos = sorted({v for p in products.values() for v in videos_of(p)})
     made_img = optimize_images(photo_sources)
     made_poster = make_posters(videos)
     made_video, video_out = compress_videos(videos)
