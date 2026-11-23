@@ -380,6 +380,11 @@ var PRODUCTS = {
         longDescription:"",
         specs:{"Розмір":"40","Матеріал":"Шкіра, хутро","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
+    "Мм-1": { dept:"bags", category:"Сумки", brand:"Miu Miu", name:"Wander Matelassé Hobo Bag", price:"5300 грн", code:"44335",
+        images:["content/watermarked/Мм 1-1.jpg","content/watermarked/Мм 1-2.jpg","content/watermarked/Мм 1-3.jpg","content/watermarked/Мм 1-4.jpg","content/watermarked/Мм 1-5.jpg"], video:"content/watermarked/Мм 1-6.mp4", videos:["content/watermarked/Мм 1-6.mp4"],
+        description:"Сумка Miu Miu Wander Matelassé Hobo. Матеріал — замша. Розмір — 31/25. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Розмір":"31/25","Матеріал":"Замша","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+
 };
 
 /* ===== Допоміжні функції ===== */
