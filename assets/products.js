@@ -376,6 +376,10 @@ var PRODUCTS = {
         images:["content/watermarked/Н 5-1.jpg","content/watermarked/Н 5-2.jpg","content/watermarked/Н 5-3.jpg","content/watermarked/Н 5-4.jpg","content/watermarked/Н 5-5.jpg"], video:null,
         description:"Шльопанці Hermès. Матеріал — шкіра. Розмір — 36-43. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         specs:{"Розмір":"36-43","Матеріал":"Шкіра","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+    "Н-6": { dept:"shoes", category:"Взуття", brand:"Hermès", name:"Шльопанці", price:"4400 грн", code:"1864",
+        images:["content/watermarked/Н 6-1.jpg","content/watermarked/Н 6-2.jpg","content/watermarked/Н 6-3.jpg","content/watermarked/Н 6-4.jpg","content/watermarked/Н 6-5.jpg"], video:null,
+        description:"Шльопанці Hermès. Матеріал — шкіра. Розмір — 36-43. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Розмір":"36-43","Матеріал":"Шкіра","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
     "Лп-1": { dept:"bags", category:"Сумки", brand:"Loro Piana", name:"Extra Pocket 23 in Smooth Leather Chocolate Brown", price:"4700 грн", code:"3213",
         images:["content/watermarked/Лп 1-1.jpg","content/watermarked/Лп 1-2.jpg","content/watermarked/Лп 1-3.jpg"], video:"content/watermarked/Лп 1-4.mp4",
@@ -441,6 +445,19 @@ var PRODUCTS = {
         images:["content/watermarked/Гч 2-1.jpg","content/watermarked/Гч 2-2.jpg","content/watermarked/Гч 2-3.jpg","content/watermarked/Гч 2-4.jpg"], video:null,
         description:"Gucci GG Jacquard Scarf Склад: кашемір Коплектується: подарункова коробка, пакет. Аксесуар Gucci Двосторонній палантин/шарф. Розмір — 180/40. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         specs:{"Розмір":"180/40","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+
+    "Тф-1": { dept:"eyewear", category:"Окуляри", brand:"Tom Ford", name:"Окуляри", price:"3500 грн", code:"4132",
+        images:["content/watermarked/Тф 1-1.jpg","content/watermarked/Тф 1-2.jpg","content/watermarked/Тф 1-3.jpg","content/watermarked/Тф 1-4.jpg","content/watermarked/Тф 1-5.jpg"], video:null,
+        description:"Окуляри Tom Ford. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+    "Тф-2": { dept:"eyewear", category:"Окуляри", brand:"Tom Ford", name:"Окуляри", price:"3500 грн", code:"4323",
+        images:["content/watermarked/Тф 2-1.jpg","content/watermarked/Тф 2-2.jpg","content/watermarked/Тф 2-3.jpg","content/watermarked/Тф 2-4.jpg","content/watermarked/Тф 2-5.jpg","content/watermarked/Тф 2-6.jpg"], video:null,
+        description:"Пакування: коробка,футляр,мікрофібра. Окуляри Tom Ford. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+    "Тф-3": { dept:"eyewear", category:"Окуляри", brand:"Tom Ford", name:"Окуляри", price:"3500 грн", code:"4324",
+        images:["content/watermarked/Тф 3-1.jpg","content/watermarked/Тф 3-2.jpg","content/watermarked/Тф 3-3.jpg","content/watermarked/Тф 3-4.jpg","content/watermarked/Тф 3-5.jpg","content/watermarked/Тф 3-6.jpg"], video:null,
+        description:"Окуляри Tom Ford. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
 };
 
