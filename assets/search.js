@@ -3,60 +3,118 @@
    Дані — assets/search-index.js (генерує build_pages.py з products.js; лише видимі товари).
    Індекс підвантажується при першому відкритті пошуку. Сервера немає — усе в браузері.
    ============================================================ */
-(function () {
+/* ---------- ЯДРО ПОШУКУ (без браузера: його ж перевіряють тести via-admin/tests/test_search.py) ----------
+   1) нормалізація: регістр, діакритика (Hermès = hermes), фонетика латиниці/кирилиці (shanel = chanel,
+      гуччі = гучі, кроссовки ≈ кросовкі);
+   2) словник брендів і типів товарів (укр/рос/англ, типові помилки) -> як у даних;
+   3) нечіткий пошук, лише коли точного збігу немає: відстань Дамерау–Левенштейна до 1 помилки для слів
+      з 4–6 літер і до 2 — для довших (коротші слова й коди — лише точно). Точні збіги — вище. */
+var SearchCore = (function () {
     'use strict';
 
-    /* корінь сайту — з адреси цього скрипта (сторінки лежать на різній глибині) */
-    var me = document.currentScript && document.currentScript.src;
-    var ROOT = me ? me.replace(/assets\/search\.js(\?.*)?$/, '') : '/';
-    var TG = 'https://t.me/via_manager';
-    var LIMIT = 8;
-
-    /* ---------- нормалізація: регістр, діакритика (Hermès = hermes), кирилиця -> латиниця для брендів ---------- */
-    function norm(s) {
+    function base(s) {
         return String(s || '').toLowerCase()
             .normalize('NFD').replace(/[̀-ͯ]/g, '')      // é -> e, ї -> і, й -> и
             .replace(/[’'`ʼ]/g, '')
-            .replace(/ё/g, 'е').replace(/ы/g, 'и').replace(/э/g, 'е')
-            .replace(/[^a-z0-9а-яієґ]+/g, ' ')
+            .replace(/[^a-z0-9а-яієґё]+/g, ' ')
             .trim();
     }
-    /* кириличні та скорочені назви брендів -> як у даних (після norm) */
-    var ALIASES = {
-        'chanel': ['шанель', 'шанел', 'шанэль'],
-        'dior': ['діор', 'диор'],
-        'gucci': ['гуччі', 'гучі', 'гуччи', 'гучи'],
-        'louis vuitton': ['луї віттон', 'луі вітон', 'луї вітон', 'луі віттон', 'луи виттон', 'луи витон', 'луї', 'віттон', 'вітон', 'лв', 'lv'],
-        'hermes': ['гермес', 'ермес', 'эрмес', 'гермєс'],
-        'prada': ['прада'],
-        'balenciaga': ['баленсіага', 'баленсиага', 'баленсіяга'],
-        'bottega veneta': ['боттега венета', 'ботега венета', 'боттега', 'ботега'],
-        'coach': ['коуч', 'коач'],
-        'van cleef arpels': ['ван кліф і арпельс', 'ван кліф арпельс', 'ван кліф', 'ван клиф', 'ван кліфф', 'vca'],
-        'chrome hearts': ['хром хартс', 'хром хартз', 'хромхартс'],
-        'golden goose': ['голден гус', 'голден гуз', 'ggdb'],
-        'dolce gabbana': ['дольче габбана', 'дольче габана', 'дольче', 'д г', 'дг', 'd g', 'dg'],
-        'loro piana': ['лоро піана', 'лоро пиана', 'лоро'],
-        'miu miu': ['міу міу', 'миу миу', 'міумію'],
-        'tom ford': ['том форд'],
-        'bvlgari': ['булгарі', 'бвлгарі', 'булгари', 'bulgari']
-    };
-    var ALIAS_LIST = [];
-    Object.keys(ALIASES).forEach(function (to) {
-        ALIASES[to].forEach(function (from) { ALIAS_LIST.push([norm(from), to]); });
-    });
-    ALIAS_LIST.sort(function (a, b) { return b[0].length - a[0].length; });   // довші фрази першими
+    /* фонетика одного слова: різні написання одного звучання -> одна форма */
+    function phon(w) {
+        if (/[a-z]/.test(w)) {
+            w = w.replace(/sch/g, 'ch').replace(/sh/g, 'ch').replace(/ph/g, 'f')
+                .replace(/ck/g, 'k').replace(/q/g, 'k').replace(/w/g, 'v').replace(/y/g, 'i');
+        }
+        if (/[а-яієґё]/.test(w)) {
+            w = w.replace(/[єэё]/g, 'е').replace(/[иыї]/g, 'і');
+        }
+        return w.replace(/([a-zа-яієґё])\1+/g, '$1');   // подвоєні літери -> одна (цифри кодів не чіпаємо: 7322 ≠ 732)
+    }
+    function words(s) { return base(s).split(' ').filter(Boolean).map(phon); }
 
-    function prepareQuery(q) {
-        var s = ' ' + norm(q) + ' ';
-        ALIAS_LIST.forEach(function (a) {
-            s = s.split(' ' + a[0] + ' ').join(' ' + a[1] + ' ');
-        });
-        return s.trim().split(' ').filter(Boolean);
+    /* бренди: назва як у даних -> усі відомі написання (укр/рос/англ, помилки) */
+    var BRANDS = {
+        'Chanel': ['shanel', 'chanell', 'chanal', 'шанэль', 'шанел', 'шанель', 'шанель'],
+        'Louis Vuitton': ['louis vitton', 'luis vuiton', 'louis vuiton', 'louie vuitton', 'luis vuitton', 'louis viton',
+            'луи виттон', 'луи витон', 'луї вітон', 'луї віттон', 'луі вітон', 'луі віттон', 'лв', 'lv'],
+        'Gucci': ['gucchi', 'guchi', 'гуччи', 'гучи', 'гучі', 'гуччі'],
+        'Hermès': ['ermes', 'hermess', 'гермес', 'эрмес', 'ермес', 'гермєс'],
+        'Dior': ['диор', 'діор'],
+        'Balenciaga': ['balensiaga', 'balenciga', 'баленсиага', 'баленсіага'],
+        'Bottega Veneta': ['bottega', 'botega', 'botega veneta', 'боттега венета', 'ботега венета', 'боттега', 'ботега'],
+        'Prada': ['прада'],
+        'Coach': ['couch', 'коуч', 'коач'],
+        'Van Cleef & Arpels': ['van cleef', 'van clif', 'van clef', 'vancleef', 'van cleef arpels', 'ван клиф', 'ван кліф',
+            'ван кліф арпельс', 'ван клиф арпельс', 'vca'],
+        'Chrome Hearts': ['chrom harts', 'chrome harts', 'chrom hearts', 'хром хартс', 'хром хартз'],
+        'Golden Goose': ['goldengoose', 'голден гус', 'голден гуз', 'ggdb'],
+        'Dolce & Gabbana': ['dolce gabbana', 'dolce gabana', 'dolce', 'd g', 'dg', 'дольче габбана', 'дольче габана', 'дольче', 'дг'],
+        'Loro Piana': ['лоро пиана', 'лоро піана'],
+        'Miu Miu': ['миу миу', 'міу міу'],
+        'Tom Ford': ['том форд'],
+        'Bvlgari': ['bulgari', 'булгари', 'булгарі', 'бвлгарі'],
+        'Rolex': ['ролекс'],
+        'Cartier': ['картье', 'картьє']
+    };
+    /* типи товарів: будь-яке написання -> «хоча б одне з цих слів» у товарі (як у search-index.js) */
+    var TYPES = [
+        [['сумка', 'bag'], ['сумка', 'сумки', 'сумочка', 'бег', 'беги', 'bag', 'bags', 'torba', 'торба']],
+        [['кросівки', 'sneakers'], ['кроссовки', 'кросовки', 'кросівки', 'sneakers', 'sneaker', 'snikers', 'сникерс']],
+        [['окуляри', 'glasses', 'sunglasses'], ['очки', 'окуляри', 'glasses', 'sunglasses']],
+        [['браслет', 'bracelet'], ['браслет', 'браслети', 'bracelet', 'braslet']],
+        [['гаманець', 'wallet'], ['кошелек', 'кошельок', 'гаманець', 'wallet']],
+        [['ремінь', 'belt'], ['ремень', 'ремінь', 'belt']],
+        [['годинник', 'watch'], ['часы', 'годинник', 'watch']],
+        [['сережки', 'earrings'], ['серьги', 'сережки', 'earrings']],
+        [['каблучка', 'ring'], ['кольцо', 'каблучка', 'ring']],
+        [['шарф', 'scarf', 'палантин'], ['шарф', 'scarf']],
+        [['хустка', 'scarf'], ['платок', 'хустка']]
+    ];
+
+    /* фраза (фонетичні слова через пробіл) -> {q: слова, any: групи, show: як показати, brand: так/ні} */
+    var ALIAS = {}, MAXLEN = 1;
+    function addAlias(key, val) {
+        var k = words(key).join(' ');
+        if (!k || ALIAS[k]) return;
+        ALIAS[k] = val;
+        MAXLEN = Math.max(MAXLEN, k.split(' ').length);
+    }
+    Object.keys(BRANDS).forEach(function (b) {
+        var val = { q: words(b), show: b, brand: true };
+        addAlias(b, val);
+        BRANDS[b].forEach(function (k) { addAlias(k, val); });
+    });
+    TYPES.forEach(function (t) {
+        var val = { any: t[0].map(function (w) { return words(w).join(' '); }), show: t[0][0] };
+        t[1].forEach(function (k) { addAlias(k, val); });
+    });
+
+    /* Дамерау–Левенштейн (перестановка сусідніх літер = 1 помилка); max — далі не рахуємо */
+    function dl(a, b, max) {
+        if (Math.abs(a.length - b.length) > max) return max + 1;
+        var d = [], i, j;
+        for (i = 0; i <= a.length; i++) { d[i] = [i]; }
+        for (j = 0; j <= b.length; j++) { d[0][j] = j; }
+        for (i = 1; i <= a.length; i++) {
+            var rowMin = Infinity;
+            for (j = 1; j <= b.length; j++) {
+                var c = a[i - 1] === b[j - 1] ? 0 : 1;
+                var v = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + c);
+                if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) v = Math.min(v, d[i - 2][j - 2] + 1);
+                d[i][j] = v;
+                if (v < rowMin) rowMin = v;
+            }
+            if (rowMin > max) return max + 1;
+        }
+        return d[a.length][b.length];
+    }
+    function allowed(tok) {
+        if (/\d/.test(tok) || tok.length < 4) return 0;     // коди і короткі слова — лише точно
+        return tok.length <= 6 ? 1 : 2;
     }
 
     var CYR = /[а-яієґ]/;
-    /* «сумки» має знаходити «сумка», «браслети» — «браслет»: для кирилиці відкидаємо закінчення */
+    /* «сумки» знаходить «сумка», «браслети» — «браслет»: для кирилиці відкидаємо закінчення */
     function variants(tok) {
         var out = [tok];
         if (CYR.test(tok)) {
@@ -66,57 +124,156 @@
         return out;
     }
 
-    var INDEX = null, loading = null;
-    function prepIndex() {
-        INDEX = (window.SEARCH_INDEX || []).map(function (it, i) {
-            return {
+    var ITEMS = [], VOCAB = [], SHOW = {};
+    function setIndex(rows) {
+        var vocab = {};
+        SHOW = {};
+        ITEMS = (rows || []).map(function (it, i) {
+            var e = {
                 it: it, i: i,
-                brand: ' ' + norm(it.b),
-                name: ' ' + norm(it.n),
-                code: norm(it.c),
-                all: ' ' + norm([it.b, it.n, it.c, it.t, it.co].join(' '))
+                brand: words(it.b), name: words(it.n), code: base(it.c).replace(/ /g, ''),
+                rest: words([it.c, it.t, it.co].join(' '))
             };
+            /* як показати слово у «Показано результати для»: оригінальне написання з бренду/назви */
+            [[it.b, e.brand], [it.n, e.name]].forEach(function (pair) {
+                var orig = base(pair[0]).split(' ');
+                var src = String(pair[0] || '').split(/[\s\/&,]+/).filter(function (x) { return base(x); });
+                pair[1].forEach(function (w, k) {
+                    if (!SHOW[w]) SHOW[w] = src[k] || orig[k] || w;
+                });
+            });
+            e.brand.concat(e.name, e.rest).forEach(function (w) { vocab[w] = 1; });
+            return e;
         });
+        VOCAB = Object.keys(vocab);
     }
+
+    function hasPrefix(list, t) {
+        for (var i = 0; i < list.length; i++) if (list[i].indexOf(t) === 0) return true;
+        return false;
+    }
+
+    /* запит -> слова з урахуванням словника; кожне слово: {q, any?, show, changed, fuzzy?} */
+    function parse(q) {
+        var raw = base(q).split(' ').filter(Boolean);
+        var toks = raw.map(function (w) { return { q: phon(w), show: w, changed: false }; });
+        var out = [];
+        for (var i = 0; i < toks.length;) {
+            var hit = null, len = 0;
+            for (var L = Math.min(MAXLEN, toks.length - i); L >= 1 && !hit; L--) {
+                var key = toks.slice(i, i + L).map(function (t) { return t.q; }).join(' ');
+                if (ALIAS[key]) { hit = ALIAS[key]; len = L; }
+            }
+            if (!hit) { out.push(toks[i]); i++; continue; }
+            var typed = raw.slice(i, i + len).join(' ');
+            if (hit.any) {
+                out.push({ any: hit.any, show: hit.show, changed: false });
+            } else {
+                var same = typed === base(hit.show);
+                hit.q.forEach(function (w, k) {
+                    out.push({ q: w, show: k === 0 ? hit.show : '', changed: !same, brand: true });
+                });
+            }
+            i += len;
+        }
+        /* слово, що після нормалізації стало однією літерою («qq» -> «k»), знаходило б усе підряд — пропускаємо
+           (цифри лишаються; «d&g», «лв» уже замінені словником) */
+        return out.filter(function (t) { return t.any || t.brand || t.q.length > 1 || /\d/.test(t.q); });
+    }
+
+    function matchWord(e, t) {
+        /* вага збігу слова t у товарі e (0 — немає) */
+        if (e.code && e.code === t) return 50;
+        if (e.code && /\d/.test(t) && e.code.indexOf(t) === 0) return 20;
+        if (hasPrefix(e.brand, t)) return 8;
+        if (hasPrefix(e.name, t)) return 5;
+        if (hasPrefix(e.rest, t)) return 2;
+        return 0;
+    }
+
+    function search(q) {
+        var toks = parse(q);
+        var res = { items: [], corrected: false, label: '' };
+        if (!toks.length) return res;
+        /* слова без жодного точного збігу у словнику сайту — шукаємо схожі (нечіткий пошук) */
+        toks.forEach(function (t) {
+            if (t.any || t.brand) return;
+            var exact = variants(t.q).some(function (v) { return VOCAB.some(function (w) { return w.indexOf(v) === 0; }); });
+            if (exact) return;
+            var k = allowed(t.q);
+            if (!k) return;
+            var best = k + 1, cands = [];
+            VOCAB.forEach(function (w) {
+                var dist = dl(t.q, w, k);
+                if (t.q.length >= 5 && w.length > t.q.length) dist = Math.min(dist, dl(t.q, w.slice(0, t.q.length), k));
+                if (dist < best) { best = dist; cands = [w]; }
+                else if (dist === best && dist <= k) cands.push(w);
+            });
+            if (cands.length) {
+                t.fuzzy = cands;
+                t.changed = true;
+                t.show = SHOW[cands[0]] || cands[0];
+            }
+        });
+        var scored = [];
+        ITEMS.forEach(function (e) {
+            var score = 0;
+            for (var k = 0; k < toks.length; k++) {
+                var t = toks[k], hit = 0, j;
+                if (t.any) {
+                    for (j = 0; j < t.any.length && !hit; j++) {
+                        var ws = t.any[j].split(' '), all = 1, sum = 0;
+                        ws.forEach(function (w) { var m = matchWord(e, w); if (!m) all = 0; sum += m; });
+                        if (all) hit = sum;
+                    }
+                } else if (t.fuzzy) {
+                    for (j = 0; j < t.fuzzy.length && !hit; j++) hit = matchWord(e, t.fuzzy[j]) ? 1 : 0;   // нечіткі — нижче
+                } else {
+                    var vs = variants(t.q);
+                    for (j = 0; j < vs.length && !hit; j++) hit = matchWord(e, vs[j]);
+                }
+                if (!hit) return;
+                score += hit;
+            }
+            scored.push({ e: e, s: score });
+        });
+        scored.sort(function (a, b) { return b.s - a.s || a.e.i - b.e.i; });   // однакова вага — новинки першими
+        res.items = scored.map(function (r) { return r.e.it; });
+        res.corrected = res.items.length > 0 && toks.some(function (t) { return t.changed; });
+        res.label = toks.map(function (t) { return t.show; }).filter(Boolean).join(' ');
+        return res;
+    }
+
+    return { setIndex: setIndex, search: search, parse: parse, phon: phon, base: base, dl: dl };
+})();
+if (typeof module === 'object' && module && module.exports) module.exports = SearchCore;
+
+(function () {
+    'use strict';
+    if (typeof document === 'undefined') return;     // тести в Node — лише ядро
+
+    /* корінь сайту — з адреси цього скрипта (сторінки лежать на різній глибині) */
+    var me = document.currentScript && document.currentScript.src;
+    var ROOT = me ? me.replace(/assets\/search\.js(\?.*)?$/, '') : '/';
+    var TG = 'https://t.me/via_manager';
+    var LIMIT = 8;
+
+    var READY = false, loading = null;
+    function prepIndex() { SearchCore.setIndex(window.SEARCH_INDEX || []); READY = true; }
     function loadIndex(cb) {
-        if (INDEX) return cb();
+        if (READY) return cb();
         if (window.SEARCH_INDEX) { prepIndex(); return cb(); }
         if (!loading) {
             loading = [];
             var s = document.createElement('script');
             s.src = ROOT + 'assets/search-index.js';
             s.onload = function () { prepIndex(); loading.forEach(function (f) { f(); }); };
-            s.onerror = function () { INDEX = []; loading.forEach(function (f) { f(); }); };
+            s.onerror = function () { READY = true; loading.forEach(function (f) { f(); }); };
             document.head.appendChild(s);
         }
         loading.push(cb);
     }
-
-    /* кожне слово запиту має знайтись на початку якогось слова товару (бренд, назва, код, тип, колір) */
-    function search(q) {
-        var toks = prepareQuery(q);
-        if (!toks.length || !INDEX) return [];
-        var res = [];
-        INDEX.forEach(function (e) {
-            var score = 0;
-            for (var k = 0; k < toks.length; k++) {
-                var vs = variants(toks[k]), hit = 0;
-                for (var v = 0; v < vs.length && !hit; v++) {
-                    var t = vs[v];
-                    if (e.code && e.code === t) hit = 50;
-                    else if (e.code && e.code.indexOf(t) === 0 && /\d/.test(t)) hit = 20;
-                    else if (e.brand.indexOf(' ' + t) >= 0) hit = 8;
-                    else if (e.name.indexOf(' ' + t) >= 0) hit = 5;
-                    else if (e.all.indexOf(' ' + t) >= 0) hit = 2;
-                }
-                if (!hit) return;
-                score += hit;
-            }
-            res.push({ e: e, s: score });
-        });
-        res.sort(function (a, b) { return b.s - a.s || a.e.i - b.e.i; });   // однакова вага — новинки першими
-        return res.map(function (r) { return r.e.it; });
-    }
+    function search(q) { return SearchCore.search(q); }
 
     /* ---------- спільне ---------- */
     function esc(s) {
@@ -137,6 +294,10 @@
         if (a === 1 && b !== 11) return n + ' товар';
         if (a >= 2 && a <= 4 && (b < 12 || b > 14)) return n + ' товари';
         return n + ' товарів';
+    }
+    /* знайдено через виправлення написання — показуємо, що саме шукали */
+    function didYouMean(r) {
+        return r.corrected ? '<p class="search-fixed">Показано результати для: <b>' + esc(r.label) + '</b></p>' : '';
     }
     function searchUrl(q) { return ROOT + 'search.html?q=' + encodeURIComponent(q); }
     function emptyHtml() {
@@ -191,9 +352,10 @@
         if (q.length < 2) { current = []; hint(); return; }
         loadIndex(function () {
             if (input.value.trim() !== q) return;          // поки вантажився індекс, запит змінився
-            current = search(q);
+            var r = search(q);
+            current = r.items;
             if (!current.length) { list.innerHTML = emptyHtml(); return; }
-            var html = '<ul class="search-list" role="listbox">';
+            var html = didYouMean(r) + '<ul class="search-list" role="listbox">';
             current.slice(0, LIMIT).forEach(function (it, i) {
                 html += '<li role="option" id="sr' + i + '"><a class="search-item" href="' + ROOT + it.u + '">' +
                     '<span class="search-thumb">' + (it.i ? '<img src="' + thumbSrc(it) + '" alt="" loading="lazy" decoding="async">' : '') + '</span>' +
@@ -301,7 +463,8 @@
     document.title = 'Пошук: ' + q + ' | via.accessories';
     status.innerHTML = '<p class="search-query">«' + esc(q) + '»</p>';
     loadIndex(function () {
-        var found = search(q);
+        var r = search(q), found = r.items;
+        if (r.corrected) status.innerHTML = '<p class="search-query">«' + esc(q) + '»</p>' + didYouMean(r);
         if (!found.length) {
             status.innerHTML = '<p class="search-query">«' + esc(q) + '»</p>' + emptyHtml();
             return;

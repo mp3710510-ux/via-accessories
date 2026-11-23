@@ -728,3 +728,7 @@ html.order-open { overflow: hidden; }
 /* сторінка бренду: панель фільтрів одразу під перемикачами відділів — одна лінія замість двох */
 .dept-filter + .filter-bar { margin-top: -46px; border-top: 0; }
 @media (max-width: 900px) { .dept-filter + .filter-bar { margin-top: -34px; } }
+/* пошук: знайдено через виправлення написання */
+.search-fixed { font-size: 12px; letter-spacing: 1px; color: #6b6258; padding: 6px 10px 12px; }
+.search-fixed b { font-weight: 500; color: #1c1a17; }
+.search-status .search-fixed { padding: 4px 0 0; font-size: 13px; }
