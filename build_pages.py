@@ -24,11 +24,17 @@ build_pages.py — генератор статичних сторінок тов
   * вписує товари прямо в HTML каталогу (catalog.html) і «Хітів сезону» на головній (index.html) —
     між маркерами <!-- build:... -->, щоб пошуковик бачив посилання на товари без JavaScript;
   * додає на сторінку товару блок «Схожі товари» (той самий бренд / відділ);
+  * сітки товарів (відділи, «відділ + бренд», бренди, каталог) — новинки першими (поле added) і з
+    data-атрибутами (ціна, бренд, колір, дата, назва) для фільтрів і сортування (assets/filters.js);
+    на сторінці відділу під плитками брендів — усі товари відділу;
+  * створює assets/search-index.js (видимі товари для пошуку в шапці, assets/search.js) і search.html —
+    сторінку результатів пошуку (noindex, не в sitemap);
   * створює sitemap.xml (з <lastmod>), robots.txt і feed.xml (фід товарів для Google Merchant Center).
 
 Необов'язкові поля товару (їх ставить адмінка via-admin):
   * longDescription — довгий опис: блок «Опис» під товаром (лише якщо заповнений);
   * hit: true — «Новинка / Хіт»: товар першим потрапляє в «Хіти сезону» на головній;
+  * added: "YYYY-MM-DD" — дата додавання (адмінка ставить при створенні): сортування «Новинки»;
   * hidden: true — немає в наявності: товару немає в каталозі, на сторінках бренду/відділу, у «Схожих»,
     «Хітах», sitemap.xml і feed.xml. Його сторінка лишається за тією самою адресою (без noindex) з
     позначкою «Немає в наявності», без кнопок кошика/замовлення і з availability OutOfStock у JSON-LD —
@@ -809,8 +815,82 @@ function picHtml(src, alt, sizes, eager, cls) {
 """
 
 
-def card_html(pid, p, slug, full_name, loading="lazy", prefix="../"):
-    """Картка товару, як у каталозі; посилання прямо в HTML. prefix — шлях до кореня сайту."""
+CARD_META = {}                      # id -> дані для фільтрів/сортування (data-атрибути картки), див. card_meta()
+FILTER_FACETS_ALL = "brand,price,color"      # відділи, каталог, пошук
+FILTER_FACETS_BRAND = "price,color"          # сторінка бренду / «відділ + бренд»: бренд уже обрано
+
+
+def card_meta(products, depts):
+    """Дані картки для фільтрів і сортування: ціна, бренд, колір (з характеристики «Колір» або з назви —
+    той самий розбір, що й у feed_meta.py), дата додавання, назва."""
+    fm = load_feed_meta()
+    out = {}
+    for pid, p in products.items():
+        brand = p.get("brand") or ""
+        if brand == "Інше":
+            brand = ""
+        num = price_number(p)
+        color = fm.final(p, depts.get(p.get("dept"), {}).get("title", "")).get("color") or ""
+        out[pid] = {
+            "price": ("%g" % num) if num is not None else "",
+            "brand": slugify(brand) if brand else "", "brand-name": brand,
+            "color": slugify(color) if color else "", "color-name": color,
+            "added": p.get("added") or "", "name": p.get("name") or "",
+        }
+    return out
+
+
+def search_index_js(visible, slugs, depts):
+    """assets/search-index.js — компактні дані видимих товарів для пошуку в шапці (assets/search.js).
+    Тип товару — українською і англійською зі словника feed_meta.py (сумка/bag/handbag…), щоб «браслет»
+    і «bracelet» знаходили те саме. Приховані товари сюди не потрапляють."""
+    fm = load_feed_meta()
+    en_by_uk = {}
+    for word, (uk, _, _) in fm._T.items():
+        if " " in word or word in getattr(fm, "KEEP_IN_MODEL", ()):   # «wallet on chain», «woc» — не загальний тип
+            continue
+        en_by_uk.setdefault(uk, []).append(word)
+    rows = []
+    for pid, p in newest_first(visible.items()):
+        dept_title = depts.get(p.get("dept"), {}).get("title", "")
+        info = fm.final(p, dept_title)
+        types = [info["type"]] + en_by_uk.get(info["type"], []) + [dept_title]
+        num = price_number(p)
+        img = (p.get("images") or [""])[0]
+        m = CARD_META.get(pid, {})
+        row = {
+            "u": "products/%s.html" % slugs[pid], "id": pid, "n": p.get("name") or "",
+            "b": "" if (p.get("brand") or "") == "Інше" else (p.get("brand") or ""),
+            "c": str(p.get("code") or ""), "t": " ".join(dict.fromkeys(t for t in types if t)),
+            "p": (p.get("price") or "").strip() if num is not None else "", "pn": num if num is not None else 0,
+            "i": img, "a": p.get("added") or "", "co": m.get("color-name", ""),
+            "bs": m.get("brand", ""), "cs": m.get("color", ""),     # ті самі ключі, що в data-атрибутах карток
+        }
+        if img in IMG_META:
+            row["wh"] = [IMG_META[img]["w"], IMG_META[img]["h"]]
+            row["ws"] = IMG_META[img]["s"]
+        rows.append(row)
+    return ("/* Згенеровано build_pages.py — індекс пошуку (видимі товари, новинки першими). Не редагувати. */\n"
+            "var SEARCH_INDEX = %s;\n" % json.dumps(rows, ensure_ascii=False, separators=(",", ":")))
+
+
+def newest_first(items):
+    """Новинки першими (поле added; однакові дати — у порядку products.js). Так статична сітка вже
+    відсортована «Новинки» — JS нічого не переставляє при завантаженні."""
+    return sorted(items, key=lambda it: it[1].get("added") or "", reverse=True)
+
+
+def filter_root(inner, facets):
+    """Обгортка, яку знаходить assets/filters.js: картки з data-атрибутами всередині; без JS — просто сітка."""
+    return '<div class="filter-root" data-filter-root data-facets="%s">\n%s</div>\n' % (facets, inner)
+
+
+def card_html(pid, p, slug, full_name, loading="lazy", prefix="../", data=False):
+    """Картка товару, як у каталозі; посилання прямо в HTML. prefix — шлях до кореня сайту.
+    data=True — з data-атрибутами для фільтрів і сортування (сітки сторінок списків і каталогу)."""
+    attrs = ""
+    if data and pid in CARD_META:
+        attrs = "".join(' data-%s="%s"' % (k, esc(v)) for k, v in CARD_META[pid].items())
     href = "%sproducts/%s.html" % (prefix, slug)
     img = picture_html(p["images"][0], full_name, CARD_SIZES, prefix, loading) if p.get("images") else ""
     code = str(p.get("code") or "")
@@ -818,13 +898,13 @@ def card_html(pid, p, slug, full_name, loading="lazy", prefix="../"):
     price = '<div class="price">%s</div>' % esc((p.get("price") or "").strip()) if num is not None else ""
     code_html = '<div class="code">%s</div>' % esc(code) if code else ""
     return (
-        '<div class="card">'
+        '<div class="card"%s>'
         '<a href="%s" style="display:block;text-decoration:none;color:inherit;">'
         '<div class="card-image">%s</div></a>'
         '<div class="card-caption"><a href="%s" style="text-decoration:none;color:inherit;">'
         '<div class="name">%s</div>%s%s</a>'
         '<button class="add-to-cart" type="button" data-id="%s">У кошик</button></div></div>'
-        % (href, img, href, esc(p["name"]), price, code_html, esc(pid))
+        % (attrs, href, img, href, esc(p["name"]), price, code_html, esc(pid))
     )
 
 
@@ -844,21 +924,29 @@ def listing_items_json(items):
 
 
 def build_listing(tpl, rel, h1, subtitle, brands_line, title, description, crumbs, ld_crumbs, items, slugs, full_names,
-                  brand_tiles="", grid=None):
+                  brand_tiles="", grid=None, facets=FILTER_FACETS_ALL, tiles_heading=""):
     """grid — готовий HTML замість звичайної сітки (сторінка бренду з групами за відділами).
-    Сторінка в підпапці другого рівня (category/<відділ>/<бренд>.html) — відносні шляхи шаблону стають ../../"""
+    Відносні шляхи шаблону (../) переписуються під глибину сторінки: корінь (search.html) — без ../,
+    підпапка другого рівня (category/<відділ>/<бренд>.html) — ../../
+    Сітка товарів обгорнута в filter-root (фільтри і сортування, assets/filters.js); facets — які фільтри.
+    brand_tiles (сторінка відділу) — плитки брендів, під ними заголовок tiles_heading і всі товари відділу."""
     url = "%s/%s" % (SITE_URL, rel)
     depth = rel.count("/")
     prefix = "../" * depth
-    if depth > 1:
+    if depth != 1:
         tpl = re.sub(r'(href|src)="\.\./', lambda m: '%s="%s' % (m.group(1), prefix), tpl)
     first = items[0][1] if items else {}
     og_image = ("%s/%s" % (SITE_URL, url_path(first["images"][0]))) if first.get("images") else ""
+    items = newest_first(items)
     # найперша картка (LCP) — з високим пріоритетом і без lazy; решта — lazy (ті, що вже на екрані, браузер все одно вантажить одразу)
     cards = "\n".join(
-        card_html(pid, p, slugs[pid], full_names[pid], "high" if i == 0 else "lazy", prefix)
+        card_html(pid, p, slugs[pid], full_names[pid], "high" if i == 0 and not brand_tiles else "lazy", prefix, True)
         for i, (pid, p) in enumerate(items)
     )
+    if grid is None and items:
+        grid = '<div class="grid">\n%s\n</div>\n' % cards
+    if brand_tiles and tiles_heading and grid:
+        brand_tiles += '<h2 class="listing-h2">%s</h2>\n' % esc(tiles_heading)
     ld = breadcrumb_jsonld(ld_crumbs)
     ld_body = ld.split("\n", 1)[1].rsplit("\n", 1)[0]
     repl = {
@@ -873,8 +961,7 @@ def build_listing(tpl, rel, h1, subtitle, brands_line, title, description, crumb
         "SUBTITLE_BLOCK": ('<div class="subtitle">%s</div>\n' % esc(subtitle)) if subtitle else "",
         "BRANDS_LINE": brands_line,
         "BRAND_TILES": brand_tiles,
-        # на сторінці відділу — лише плитки брендів (товари — на сторінках брендів); інакше сітка товарів
-        "GRID": "" if brand_tiles else grid if grid is not None else '<div class="grid">\n%s\n</div>\n' % cards,
+        "GRID": filter_root(grid, facets) if grid else "",
         "ITEMS_JSON": listing_items_json(items),
     }
     out = tpl
@@ -915,7 +1002,7 @@ def brand_sections_html(brand, items, depts, dept_brand_pages, slugs, full_names
     """Сторінка бренду: товари згруповані за відділами (порядок — як у меню сайту, DEPT_SLUGS).
     Над групами — перемикачі «Усі / Сумки / …» (якщо відділів більше одного)."""
     order = list(DEPT_SLUGS) + sorted({p.get("dept") or "" for _, p in items} - set(DEPT_SLUGS))
-    groups = [(d, [it for it in items if (it[1].get("dept") or "") == d]) for d in order]
+    groups = [(d, newest_first([it for it in items if (it[1].get("dept") or "") == d])) for d in order]
     groups = [(d, g) for d, g in groups if g]
     if not groups:
         return None
@@ -931,7 +1018,7 @@ def brand_sections_html(brand, items, depts, dept_brand_pages, slugs, full_names
         dtitle = depts.get(d, {}).get("title", d)
         cards = []
         for pid, p in g:
-            cards.append(card_html(pid, p, slugs[pid], full_names[pid], "high" if n == 0 else "lazy"))
+            cards.append(card_html(pid, p, slugs[pid], full_names[pid], "high" if n == 0 else "lazy", "../", True))
             n += 1
         more = ""
         page = dept_brand_pages.get((d, brand))
@@ -1264,6 +1351,8 @@ def main():
     clean_dir(BRANDS_DIR)
     clean_dir(CATEGORY_DIR, subdirs=True)
     full_names = {pid: full_name_of(p) for pid, p in products.items()}
+    CARD_META.clear()
+    CARD_META.update(card_meta(visible, depts))
 
     urls, priced = [], 0
     for pid, p in products.items():
@@ -1295,6 +1384,7 @@ def main():
             [home, (brand, "%s/%s" % (SITE_URL, rel))],
             items, slugs, full_names,
             grid=brand_sections_html(brand, items, depts, dept_brand_pages, slugs, full_names),
+            facets=FILTER_FACETS_BRAND,
         )
         write(os.path.join(ROOT, rel), page)
         listing_urls.append(url)
@@ -1314,6 +1404,7 @@ def main():
             [home_link, '<span class="current">%s</span>' % esc(dtitle)],
             [home, (dtitle, "%s/%s" % (SITE_URL, rel))],
             items, slugs, full_names, tiles,
+            tiles_heading="Усе взуття" if d == "shoes" else "Усі %s" % dtitle.lower(),
         )
         write(os.path.join(ROOT, rel), page)
         listing_urls.append(url)
@@ -1334,17 +1425,35 @@ def main():
                 [home_link, '<a href="../../%s">%s</a><span class="sep">›</span>' % (rel, esc(dtitle)),
                  '<span class="current">%s</span>' % esc(b)],
                 [home, (dtitle, "%s/%s" % (SITE_URL, rel)), (b, "%s/%s" % (SITE_URL, brel))],
-                bitems, slugs, full_names,
+                bitems, slugs, full_names, facets=FILTER_FACETS_BRAND,
             )
             write(os.path.join(ROOT, brel), page)
             listing_urls.append(url)
 
-    # --- каталог: уся сітка товарів у HTML (JS лише вмикає кнопки; фільтри ?dept=/?brand= малює JS) ---
+    # --- каталог: уся сітка товарів у HTML, новинки першими (JS вмикає кнопки, фільтри й сортування;
+    #     старі адреси ?dept=/?brand=<Назва> малює JS каталогу) ---
     cat_cards = "\n".join(
-        card_html(pid, p, slugs[pid], full_names[pid], "high" if i < 4 else "lazy", "")
-        for i, (pid, p) in enumerate(visible.items())
+        card_html(pid, p, slugs[pid], full_names[pid], "high" if i < 4 else "lazy", "", True)
+        for i, (pid, p) in enumerate(newest_first(visible.items()))
     )
-    inject("catalog.html", "catalog-grid", '<div class="grid" id="catalogGrid">\n%s\n</div>\n' % cat_cards)
+    inject("catalog.html", "catalog-grid",
+           filter_root('<div class="grid" id="catalogGrid">\n%s\n</div>\n' % cat_cards, FILTER_FACETS_ALL))
+    # --- пошук: індекс товарів для assets/search.js і сторінка результатів search.html (noindex, не в sitemap) ---
+    write(os.path.join(ROOT, "assets", "search-index.js"), search_index_js(visible, slugs, depts))
+    page, _ = build_listing(
+        ltpl, "search.html", "Пошук", "", "", "Пошук | via.accessories",
+        "Пошук товарів via.accessories: бренд, модель, код.",
+        [home_link, '<span class="current">Пошук</span>'],
+        [home, ("Пошук", SITE_URL + "/search.html")],
+        [], slugs, full_names,
+        grid='<div class="search-status" id="searchStatus" aria-live="polite"></div>\n'
+             '<div class="grid" id="searchGrid"></div>\n'
+             '<noscript><p class="search-status">Пошук працює з увімкненим JavaScript. '
+             '<a href="catalog.html">Перейти до каталогу</a></p></noscript>\n',
+    )
+    page = page.replace('<div class="filter-root" data-filter-root ', '<div class="filter-root" data-filter-root data-filter-defer ', 1)
+    page = page.replace('<link rel="canonical"', '<meta name="robots" content="noindex, follow">\n<link rel="canonical"', 1)
+    write(os.path.join(ROOT, "search.html"), page)
     inject("catalog.html", "catalog-ld", breadcrumb_jsonld([home, ("Каталог", SITE_URL + "/catalog.html")]) + "\n")
     # --- головна: «Хіти сезону» у HTML ---
     hits = "\n".join(hit_card_html(pid, products[pid], slugs[pid], full_names[pid]) for pid in pick_hits(visible))

@@ -131,6 +131,7 @@
 <a href="../category/okuliary.html" data-dept="eyewear">Окуляри</a>
 </div>
 </div>
+<a href="../search.html" class="icon search-toggle" aria-label="Пошук" title="Пошук" data-search-open><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M15.6 15.6 21 21" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></a>
 </div>
 <a href="/" class="logo">via.accessories</a>
 <div class="topbar-right">
@@ -151,13 +152,15 @@
 </div>
 
 <div class="grid-wrapper">
+<div class="filter-root" data-filter-root data-facets="price,color">
 <section class="dept-section" id="okuliary">
 <h2>Окуляри</h2>
 <div class="grid">
-<div class="card"><a href="../products/chrome-hearts-ew1301.html" style="display:block;text-decoration:none;color:inherit;"><div class="card-image"><picture><source type="image/webp" srcset="../content/optimized/%D0%9A%D1%85%201-1-240.webp 240w, ../content/optimized/%D0%9A%D1%85%201-1-480.webp 480w, ../content/optimized/%D0%9A%D1%85%201-1-800.webp 800w, ../content/optimized/%D0%9A%D1%85%201-1-960.webp 960w" sizes="(max-width:500px) 100vw, (max-width:900px) 50vw, 25vw"><img src="../content/watermarked/%D0%9A%D1%85%201-1.jpg" width="960" height="1280" alt="Chrome Hearts Clear/Black AMBIDIXTROUS 50702857 53/21/151" fetchpriority="high"></picture></div></a><div class="card-caption"><a href="../products/chrome-hearts-ew1301.html" style="text-decoration:none;color:inherit;"><div class="name">Clear/Black AMBIDIXTROUS 50702857 53/21/151</div><div class="price">3200 грн</div><div class="code">EW1301</div></a><button class="add-to-cart" type="button" data-id="Кх-1">У кошик</button></div></div>
+<div class="card" data-price="3200" data-brand="chrome-hearts" data-brand-name="Chrome Hearts" data-color="chornyi" data-color-name="чорний" data-added="2026-11-12" data-name="Clear/Black AMBIDIXTROUS 50702857 53/21/151"><a href="../products/chrome-hearts-ew1301.html" style="display:block;text-decoration:none;color:inherit;"><div class="card-image"><picture><source type="image/webp" srcset="../content/optimized/%D0%9A%D1%85%201-1-240.webp 240w, ../content/optimized/%D0%9A%D1%85%201-1-480.webp 480w, ../content/optimized/%D0%9A%D1%85%201-1-800.webp 800w, ../content/optimized/%D0%9A%D1%85%201-1-960.webp 960w" sizes="(max-width:500px) 100vw, (max-width:900px) 50vw, 25vw"><img src="../content/watermarked/%D0%9A%D1%85%201-1.jpg" width="960" height="1280" alt="Chrome Hearts Clear/Black AMBIDIXTROUS 50702857 53/21/151" fetchpriority="high"></picture></div></a><div class="card-caption"><a href="../products/chrome-hearts-ew1301.html" style="text-decoration:none;color:inherit;"><div class="name">Clear/Black AMBIDIXTROUS 50702857 53/21/151</div><div class="price">3200 грн</div><div class="code">EW1301</div></a><button class="add-to-cart" type="button" data-id="Кх-1">У кошик</button></div></div>
 </div>
 <div class="dept-more"><a href="../category/okuliary/chrome-hearts.html">Дивитись усі окуляри Chrome Hearts</a></div>
 </section>
+</div>
 </div>
 
 <footer class="footer">
@@ -229,6 +232,8 @@ for (var i = 0; i < addBtns.length; i++) {
 </script>
 
 <script src="../assets/nav.js" defer></script>
+<script src="../assets/filters.js" defer></script>
+<script src="../assets/search.js" defer></script>
 <script src="../assets/cart.js" defer></script>
 
 </body>
