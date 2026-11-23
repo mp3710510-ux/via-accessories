@@ -384,6 +384,10 @@ var PRODUCTS = {
         images:["content/watermarked/Мм 1-1.jpg","content/watermarked/Мм 1-2.jpg","content/watermarked/Мм 1-3.jpg","content/watermarked/Мм 1-4.jpg","content/watermarked/Мм 1-5.jpg"], video:"content/watermarked/Мм 1-6.mp4", videos:["content/watermarked/Мм 1-6.mp4"],
         description:"Сумка Miu Miu Wander Matelassé Hobo. Матеріал — замша. Розмір — 31/25. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         specs:{"Розмір":"31/25","Матеріал":"Замша","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+    "Мм-2": { dept:"bags", category:"Сумки", brand:"Miu Miu", name:"Beau Top-Handle Bag", price:"5400 грн", code:"007535",
+        images:["content/watermarked/Мм 2-5.jpg","content/watermarked/Мм 2-1.jpg","content/watermarked/Мм 2-2.jpg","content/watermarked/Мм 2-3.jpg","content/watermarked/Мм 2-4.jpg"], video:"content/watermarked/Мм 2-6.mp4", videos:["content/watermarked/Мм 2-6.mp4"],
+        description:"Сумка Miu Miu Beau Top-Handle. Матеріал — замша. Розмір — 35/25. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Розмір":"35/25","Матеріал":"Замша","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
 };
 
