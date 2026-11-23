@@ -277,6 +277,10 @@ var PRODUCTS = {
         images:["content/watermarked/Ш 27-1.jpg","content/watermarked/Ш 27-2.jpg","content/watermarked/Ш 27-3.jpg","content/watermarked/Ш 27-4.jpg","content/watermarked/Ш 27-5.jpg"], video:"content/watermarked/Ш 27-6.mp4", videos:["content/watermarked/Ш 27-6.mp4"],
         description:"Сумка Chanel Trendy CC. Матеріал — шкіра. Розмір — 24/19/9. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         specs:{"Розмір":"24/19/9","Матеріал":"Шкіра","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+    "Ш-28": { dept:"bags", category:"Сумки", brand:"Chanel", name:"Trendy CC", price:"5400 грн", code:"76357",
+        images:["content/watermarked/Ш 28-1.jpg","content/watermarked/Ш 28-2.jpg","content/watermarked/Ш 28-3.jpg","content/watermarked/Ш 28-4.jpg","content/watermarked/Ш 28-5.jpg"], video:"content/watermarked/Ш 28-6.mp4", videos:["content/watermarked/Ш 28-6.mp4"],
+        description:"Сумка Chanel Trendy CC. Матеріал — шкіра. Розмір — 24/19/9. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Розмір":"24/19/9","Матеріал":"Шкіра","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
     "Д-1": { dept:"bags", category:"Сумки", brand:"Dior", name:"Saddle Bag Toile de Jouy Pink", price:"6200 грн", code:"6391",
         images:["content/watermarked/Д 1-1.jpg","content/watermarked/Д 1-2.jpg","content/watermarked/Д 1-3.jpg"], video:"content/watermarked/Д 1-4.mp4",
