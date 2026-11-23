@@ -71,6 +71,19 @@
 .brand-tiles .brand-tile-name{padding:14px 8px 0;font-size:14px;letter-spacing:2px}
 @media (max-width:900px){.brand-tiles{grid-template-columns:repeat(2,1fr);gap:16px}.brand-tiles .brand-tile-name{padding:12px 6px 0;font-size:13px;letter-spacing:1.5px}}
 @media (max-width:500px){.brand-tiles{grid-template-columns:repeat(2,1fr);gap:12px}}
+/* Сторінка бренду: перемикачі відділів і групи товарів за відділами */
+.dept-filter{display:flex;justify-content:center;flex-wrap:wrap;gap:10px 34px;margin:0 auto 46px;padding-bottom:22px;border-bottom:1px solid rgba(0,0,0,0.08)}
+.dept-filter a{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#6b6258;text-decoration:none;padding-bottom:6px;border-bottom:1px solid transparent;transition:color 0.3s,border-color 0.3s;white-space:nowrap}
+.dept-filter a:hover{color:#1c1a17}
+.dept-filter a.active{color:#1c1a17;border-bottom-color:var(--color-gold)}
+.dept-section{scroll-margin-top:90px}
+.dept-section+.dept-section{margin-top:70px}
+.dept-section[hidden]{display:none}
+.dept-section h2{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:#1c1a17;text-align:center;margin-bottom:34px}
+.dept-more{text-align:center;margin-top:36px}
+.dept-more a{display:inline-block;padding:14px 34px;border:1px solid #1c1a17;color:#1c1a17;text-decoration:none;font-size:12px;letter-spacing:3px;text-transform:uppercase;transition:all 0.3s}
+.dept-more a:hover{background:#1c1a17;color:#f5f1ea}
+@media (max-width:900px){.dept-filter{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:none;gap:26px;margin:0 -20px 34px;padding:0 20px 14px}.dept-filter::-webkit-scrollbar{display:none}.dept-filter a:first-child{margin-left:auto}.dept-filter a:last-child{margin-right:auto}.dept-section+.dept-section{margin-top:54px}.dept-section h2{font-size:24px;letter-spacing:4px;margin-bottom:24px}.dept-more a{padding:13px 22px;letter-spacing:2px}}
 </style>
 <link rel="icon" href="../favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
@@ -133,9 +146,13 @@
 </div>
 
 <div class="grid-wrapper">
+<section class="dept-section" id="okuliary">
+<h2>Окуляри</h2>
 <div class="grid">
 <div class="card"><a href="../products/chrome-hearts-ew1301.html" style="display:block;text-decoration:none;color:inherit;"><div class="card-image"><picture><source type="image/webp" srcset="../content/optimized/%D0%9A%D1%85%201-1-240.webp 240w, ../content/optimized/%D0%9A%D1%85%201-1-480.webp 480w, ../content/optimized/%D0%9A%D1%85%201-1-800.webp 800w, ../content/optimized/%D0%9A%D1%85%201-1-960.webp 960w" sizes="(max-width:500px) 100vw, (max-width:900px) 50vw, 25vw"><img src="../content/watermarked/%D0%9A%D1%85%201-1.jpg" width="960" height="1280" alt="Chrome Hearts Clear/Black AMBIDIXTROUS 50702857 53/21/151" fetchpriority="high"></picture></div></a><div class="card-caption"><a href="../products/chrome-hearts-ew1301.html" style="text-decoration:none;color:inherit;"><div class="name">Clear/Black AMBIDIXTROUS 50702857 53/21/151</div><div class="price">3200 грн</div><div class="code">EW1301</div></a><button class="add-to-cart" type="button" data-id="Кх-1">У кошик</button></div></div>
 </div>
+<div class="dept-more"><a href="../category/okuliary/chrome-hearts.html">Дивитись усі окуляри Chrome Hearts</a></div>
+</section>
 </div>
 
 <footer class="footer">

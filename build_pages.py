@@ -534,7 +534,28 @@ def long_desc_html(text):
     return '<section class="long-desc"><div class="long-desc-inner">\n<h2>Опис</h2>\n%s\n</div></section>\n\n' % body
 
 
-def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages, similar_html="", similar_json="{}"):
+def dept_brand_pages_of(products):
+    """(відділ, бренд) -> category/<відділ>/<бренд>.html — лише для пар, де є хоча б один видимий товар."""
+    out = {}
+    for p in products.values():
+        b, d = p.get("brand") or "", p.get("dept") or ""
+        if p.get("hidden") or not b or b == "Інше" or d not in DEPT_SLUGS:
+            continue
+        out[(d, b)] = "category/%s/%s.html" % (DEPT_SLUGS[d], slugify(b))
+    return out
+
+
+def plural_items(n):
+    """1 товар, 2 товари, 5 товарів"""
+    if n % 10 == 1 and n % 100 != 11:
+        return "%d товар" % n
+    if 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14:
+        return "%d товари" % n
+    return "%d товарів" % n
+
+
+def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages, similar_html="", similar_json="{}",
+               dept_brand_pages=None):
     page_rel = "products/%s.html" % slug
     page_url = "%s/%s" % (SITE_URL, page_rel)
     name = p["name"]
@@ -608,10 +629,16 @@ def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages, similar_html="
             '<meta property="product:price:currency" content="%s">\n' % (num, CURRENCY)
         )
 
-    # --- хлібні крихти: Головна › Бренд › Назва (бренд — посилання на його сторінку) ---
+    # --- хлібні крихти: Головна › Відділ › Бренд › Назва (бренд — сторінка «відділ + бренд»);
+    #     немає такої сторінки (напр. прихований товар) — Головна › Бренд › Назва ---
     crumbs = ['<a href="/">Головна</a>', '<span class="sep">›</span>']
     ld_crumbs = [("Головна", SITE_URL + "/")]
-    if has_brand and brand in brand_pages:
+    db_page = (dept_brand_pages or {}).get((dept, brand)) if has_brand else None
+    if db_page and dept in dept_pages:
+        crumbs += ['<a href="../%s">%s</a>' % (dept_pages[dept], esc(dept_title)), '<span class="sep">›</span>',
+                   '<a href="../%s">%s</a>' % (db_page, esc(brand)), '<span class="sep">›</span>']
+        ld_crumbs += [(dept_title, "%s/%s" % (SITE_URL, dept_pages[dept])), (brand, "%s/%s" % (SITE_URL, db_page))]
+    elif has_brand and brand in brand_pages:
         crumbs += ['<a href="../%s">%s</a>' % (brand_pages[brand], esc(brand)), '<span class="sep">›</span>']
         ld_crumbs.append((brand, "%s/%s" % (SITE_URL, brand_pages[brand])))
     elif dept in dept_pages:
@@ -814,13 +841,20 @@ def listing_items_json(items):
     return json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
 
 
-def build_listing(tpl, rel, h1, subtitle, brands_line, title, description, crumbs, ld_crumbs, items, slugs, full_names, brand_tiles=""):
+def build_listing(tpl, rel, h1, subtitle, brands_line, title, description, crumbs, ld_crumbs, items, slugs, full_names,
+                  brand_tiles="", grid=None):
+    """grid — готовий HTML замість звичайної сітки (сторінка бренду з групами за відділами).
+    Сторінка в підпапці другого рівня (category/<відділ>/<бренд>.html) — відносні шляхи шаблону стають ../../"""
     url = "%s/%s" % (SITE_URL, rel)
+    depth = rel.count("/")
+    prefix = "../" * depth
+    if depth > 1:
+        tpl = re.sub(r'(href|src)="\.\./', lambda m: '%s="%s' % (m.group(1), prefix), tpl)
     first = items[0][1] if items else {}
     og_image = ("%s/%s" % (SITE_URL, url_path(first["images"][0]))) if first.get("images") else ""
     # найперша картка (LCP) — з високим пріоритетом і без lazy; решта — lazy (ті, що вже на екрані, браузер все одно вантажить одразу)
     cards = "\n".join(
-        card_html(pid, p, slugs[pid], full_names[pid], "high" if i == 0 else "lazy")
+        card_html(pid, p, slugs[pid], full_names[pid], "high" if i == 0 else "lazy", prefix)
         for i, (pid, p) in enumerate(items)
     )
     ld = breadcrumb_jsonld(ld_crumbs)
@@ -838,7 +872,7 @@ def build_listing(tpl, rel, h1, subtitle, brands_line, title, description, crumb
         "BRANDS_LINE": brands_line,
         "BRAND_TILES": brand_tiles,
         # на сторінці відділу — лише плитки брендів (товари — на сторінках брендів); інакше сітка товарів
-        "GRID": "" if brand_tiles else '<div class="grid">\n%s\n</div>\n' % cards,
+        "GRID": "" if brand_tiles else grid if grid is not None else '<div class="grid">\n%s\n</div>\n' % cards,
         "ITEMS_JSON": listing_items_json(items),
     }
     out = tpl
@@ -850,8 +884,68 @@ def build_listing(tpl, rel, h1, subtitle, brands_line, title, description, crumb
     return out, url
 
 
+BRAND_FILTER_JS = """<script>
+/* Перемикачі відділів на сторінці бренду. Без JS видно всі секції, а перемикачі — звичайні якорі. */
+(function () {
+    var bar = document.querySelector('.dept-filter');
+    if (!bar) return;
+    var links = bar.querySelectorAll('a'), secs = document.querySelectorAll('.dept-section');
+    function apply(f) {
+        for (var i = 0; i < links.length; i++) links[i].classList.toggle('active', links[i].getAttribute('data-filter') === f);
+        for (var j = 0; j < secs.length; j++) secs[j].hidden = !!f && secs[j].id !== f;
+    }
+    bar.addEventListener('click', function (e) {
+        var a = e.target.closest('a');
+        if (!a) return;
+        e.preventDefault();
+        var f = a.getAttribute('data-filter');
+        apply(f);
+        history.replaceState(null, '', f ? '#' + f : location.pathname + location.search);
+    });
+    var h = location.hash.slice(1);
+    if (h && document.getElementById(h) && bar.querySelector('[data-filter="' + h + '"]')) apply(h);
+})();
+</script>
+"""
+
+
+def brand_sections_html(brand, items, depts, dept_brand_pages, slugs, full_names):
+    """Сторінка бренду: товари згруповані за відділами (порядок — як у меню сайту, DEPT_SLUGS).
+    Над групами — перемикачі «Усі / Сумки / …» (якщо відділів більше одного)."""
+    order = list(DEPT_SLUGS) + sorted({p.get("dept") or "" for _, p in items} - set(DEPT_SLUGS))
+    groups = [(d, [it for it in items if (it[1].get("dept") or "") == d]) for d in order]
+    groups = [(d, g) for d, g in groups if g]
+    if not groups:
+        return None
+    out, n = [], 0
+    if len(groups) > 1:
+        links = ['<a href="#" class="active" data-filter="">Усі</a>']
+        for d, _ in groups:
+            sid = DEPT_SLUGS.get(d) or "dept-%s" % slugify(d or "inshe")
+            links.append('<a href="#%s" data-filter="%s">%s</a>' % (sid, sid, esc(depts.get(d, {}).get("title", d))))
+        out.append('<nav class="dept-filter" aria-label="Відділи">\n%s\n</nav>' % "\n".join(links))
+    for d, g in groups:
+        sid = DEPT_SLUGS.get(d) or "dept-%s" % slugify(d or "inshe")
+        dtitle = depts.get(d, {}).get("title", d)
+        cards = []
+        for pid, p in g:
+            cards.append(card_html(pid, p, slugs[pid], full_names[pid], "high" if n == 0 else "lazy"))
+            n += 1
+        more = ""
+        page = dept_brand_pages.get((d, brand))
+        if page:
+            what = "усе взуття" if d == "shoes" else "усі %s" % dtitle.lower()
+            more = '<div class="dept-more"><a href="../%s">Дивитись %s %s</a></div>\n' % (page, esc(what), esc(brand))
+        out.append(
+            '<section class="dept-section" id="%s">\n<h2>%s</h2>\n<div class="grid">\n%s\n</div>\n%s</section>'
+            % (sid, esc(dtitle), "\n".join(cards), more)
+        )
+    return "\n".join(out) + "\n" + (BRAND_FILTER_JS if len(groups) > 1 else "")
+
+
 def brand_tiles_html(brands, brand_pages, logos, items):
-    """Плитки брендів (логотип або фото першого товару), як у каталозі — для сторінки відділу."""
+    """Плитки брендів (логотип або фото першого товару), як у каталозі — для сторінки відділу.
+    brand_pages — куди веде плитка (на сторінці відділу — сторінки «відділ + бренд»)."""
     tiles = []
     for i, b in enumerate(brands):
         logo = logos.get(b)
@@ -970,11 +1064,17 @@ def lastmod_dates(rels):
     return out
 
 
-def clean_dir(path):
+def clean_dir(path, subdirs=False):
+    """Видаляє старі *.html; subdirs=True — і в підпапках (category/<відділ>/), порожні підпапки прибирає."""
     os.makedirs(path, exist_ok=True)
     for fn in os.listdir(path):
-        if fn.endswith(".html"):
-            os.remove(os.path.join(path, fn))
+        full = os.path.join(path, fn)
+        if fn.endswith(".html") and os.path.isfile(full):
+            os.remove(full)
+        elif subdirs and os.path.isdir(full):
+            clean_dir(full)
+            if not os.listdir(full):
+                os.rmdir(full)
 
 
 REDIRECTS_FILE = "redirects.json"
@@ -1121,6 +1221,7 @@ def main():
     brand_pages = {b: "brands/%s.html" % slugify(b) for b in brand_counts}
     used_depts = [d for d in DEPT_SLUGS if any(p.get("dept") == d for p in products.values())]
     dept_pages = {d: "category/%s.html" % DEPT_SLUGS[d] for d in used_depts}
+    dept_brand_pages = dept_brand_pages_of(products)
     for d in {p.get("dept") for p in products.values()} - set(DEPT_SLUGS):
         print("Увага: відділ '%s' немає в DEPT_SLUGS — сторінку відділу не створено" % d)
 
@@ -1144,13 +1245,14 @@ def main():
 
     clean_dir(OUT_DIR)
     clean_dir(BRANDS_DIR)
-    clean_dir(CATEGORY_DIR)
+    clean_dir(CATEGORY_DIR, subdirs=True)
     full_names = {pid: full_name_of(p) for pid, p in products.items()}
 
     urls, priced = [], 0
     for pid, p in products.items():
         sim_html, sim_json = similar_block(pid, products, slugs, full_names)
-        page, page_url, num = build_page(tpl, pid, p, slugs[pid], depts, brand_pages, dept_pages, sim_html, sim_json)
+        page, page_url, num = build_page(tpl, pid, p, slugs[pid], depts, brand_pages, dept_pages, sim_html, sim_json,
+                                    dept_brand_pages)
         write(os.path.join(OUT_DIR, slugs[pid] + ".html"), page)
         if pid in visible:
             urls.append(page_url)
@@ -1175,17 +1277,18 @@ def main():
             [home_link, '<span class="current">%s</span>' % esc(brand)],
             [home, (brand, "%s/%s" % (SITE_URL, rel))],
             items, slugs, full_names,
+            grid=brand_sections_html(brand, items, depts, dept_brand_pages, slugs, full_names),
         )
         write(os.path.join(ROOT, rel), page)
         listing_urls.append(url)
 
-    # --- сторінки відділів ---
+    # --- сторінки відділів (плитки брендів ведуть на сторінки «відділ + бренд») ---
     for d in used_depts:
         items = [(pid, p) for pid, p in visible.items() if p.get("dept") == d]
         dtitle = depts.get(d, {}).get("title", d)
         rel = dept_pages[d]
         bs = ordered_brands(dept_brand_counts.get(d, {}), first_seen)
-        tiles = brand_tiles_html(bs, brand_pages, logos, items)
+        tiles = brand_tiles_html(bs, {b: dept_brand_pages[(d, b)] for b in bs}, logos, items)
         top = ", ".join(bs[:3])
         title = "%s — %s | via.accessories" % (dtitle, top) if top else "%s | via.accessories" % dtitle
         description = "%s — %s%s. %s." % (dtitle, top, " та інші бренди" if len(bs) > 3 else "", DELIVERY_LINE) if top else "%s. %s." % (dtitle, DELIVERY_LINE)
@@ -1197,6 +1300,27 @@ def main():
         )
         write(os.path.join(ROOT, rel), page)
         listing_urls.append(url)
+        # --- сторінки «відділ + бренд»: category/<відділ>/<бренд>.html — лише товари бренду в цьому відділі ---
+        for b in bs:
+            brel = dept_brand_pages[(d, b)]
+            bitems = [(pid, p) for pid, p in items if p.get("brand") == b]
+            h1 = "%s %s" % (dtitle, b)
+            btitle = h1 + " | via.accessories"
+            if len(btitle) > 60:
+                btitle = h1
+            os.makedirs(os.path.dirname(os.path.join(ROOT, brel)), exist_ok=True)
+            page, url = build_listing(
+                ltpl, brel, h1, "",
+                '<div class="brands-line"><a href="../../%s">Усі товари %s</a></div>\n' % (brand_pages[b], esc(b)),
+                btitle,
+                "%s у via.accessories: %s у наявності. %s." % (h1, plural_items(len(bitems)), DELIVERY_LINE),
+                [home_link, '<a href="../../%s">%s</a><span class="sep">›</span>' % (rel, esc(dtitle)),
+                 '<span class="current">%s</span>' % esc(b)],
+                [home, (dtitle, "%s/%s" % (SITE_URL, rel)), (b, "%s/%s" % (SITE_URL, brel))],
+                bitems, slugs, full_names,
+            )
+            write(os.path.join(ROOT, brel), page)
+            listing_urls.append(url)
 
     # --- каталог: уся сітка товарів у HTML (JS лише вмикає кнопки; фільтри ?dept=/?brand= малює JS) ---
     cat_cards = "\n".join(
@@ -1210,7 +1334,7 @@ def main():
     inject("index.html", "hits", hits + "\n")
 
     # старі адреси -> нові (після перейменувань); у sitemap і feed їх немає
-    generated = {"products/%s.html" % slugs[pid] for pid in products} | set(brand_pages.values()) | set(dept_pages.values())
+    generated = {"products/%s.html" % slugs[pid] for pid in products} | set(brand_pages.values()) | set(dept_pages.values()) | set(dept_brand_pages.values())
     redirects = write_redirects(generated)
 
     # id -> адреса (для каталогу, головної, кошика, старого product.html)
@@ -1261,7 +1385,7 @@ def main():
     if len(visible) != len(products):
         print("Приховано (немає в наявності): %d — %s" % (len(products) - len(visible), ", ".join(x for x in products if x not in visible)))
     print("feed.xml (Google Merchant Center): %d товарів" % feed_count)
-    print("Сторінок брендів: %d, відділів: %d" % (len(brand_pages), len(dept_pages)))
+    print("Сторінок брендів: %d, відділів: %d, «відділ + бренд»: %d" % (len(brand_pages), len(dept_pages), len(dept_brand_pages)))
     print("Оновлено файлів із навігаційними посиланнями: %d" % nav_changed)
     print("Нових WebP-копій: %d, обкладинок відео: %d, стиснених відео: %d, видалено застарілих: %d" % (made_img, made_poster, made_video, removed_opt))
     print("Приклад товару: %s" % urls[0])

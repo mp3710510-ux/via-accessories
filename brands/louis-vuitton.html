@@ -71,6 +71,19 @@
 .brand-tiles .brand-tile-name{padding:14px 8px 0;font-size:14px;letter-spacing:2px}
 @media (max-width:900px){.brand-tiles{grid-template-columns:repeat(2,1fr);gap:16px}.brand-tiles .brand-tile-name{padding:12px 6px 0;font-size:13px;letter-spacing:1.5px}}
 @media (max-width:500px){.brand-tiles{grid-template-columns:repeat(2,1fr);gap:12px}}
+/* Сторінка бренду: перемикачі відділів і групи товарів за відділами */
+.dept-filter{display:flex;justify-content:center;flex-wrap:wrap;gap:10px 34px;margin:0 auto 46px;padding-bottom:22px;border-bottom:1px solid rgba(0,0,0,0.08)}
+.dept-filter a{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#6b6258;text-decoration:none;padding-bottom:6px;border-bottom:1px solid transparent;transition:color 0.3s,border-color 0.3s;white-space:nowrap}
+.dept-filter a:hover{color:#1c1a17}
+.dept-filter a.active{color:#1c1a17;border-bottom-color:var(--color-gold)}
+.dept-section{scroll-margin-top:90px}
+.dept-section+.dept-section{margin-top:70px}
+.dept-section[hidden]{display:none}
+.dept-section h2{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:400;letter-spacing:6px;text-transform:uppercase;color:#1c1a17;text-align:center;margin-bottom:34px}
+.dept-more{text-align:center;margin-top:36px}
+.dept-more a{display:inline-block;padding:14px 34px;border:1px solid #1c1a17;color:#1c1a17;text-decoration:none;font-size:12px;letter-spacing:3px;text-transform:uppercase;transition:all 0.3s}
+.dept-more a:hover{background:#1c1a17;color:#f5f1ea}
+@media (max-width:900px){.dept-filter{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:none;gap:26px;margin:0 -20px 34px;padding:0 20px 14px}.dept-filter::-webkit-scrollbar{display:none}.dept-filter a:first-child{margin-left:auto}.dept-filter a:last-child{margin-right:auto}.dept-section+.dept-section{margin-top:54px}.dept-section h2{font-size:24px;letter-spacing:4px;margin-bottom:24px}.dept-more a{padding:13px 22px;letter-spacing:2px}}
 </style>
 <link rel="icon" href="../favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32.png">
@@ -133,6 +146,13 @@
 </div>
 
 <div class="grid-wrapper">
+<nav class="dept-filter" aria-label="Відділи">
+<a href="#" class="active" data-filter="">Усі</a>
+<a href="#sumky" data-filter="sumky">Сумки</a>
+<a href="#okuliary" data-filter="okuliary">Окуляри</a>
+</nav>
+<section class="dept-section" id="sumky">
+<h2>Сумки</h2>
 <div class="grid">
 <div class="card"><a href="../products/louis-vuitton-7322.html" style="display:block;text-decoration:none;color:inherit;"><div class="card-image"><picture><source type="image/webp" srcset="../content/optimized/%D0%9B%D0%B2%201-1-240.webp 240w, ../content/optimized/%D0%9B%D0%B2%201-1-480.webp 480w, ../content/optimized/%D0%9B%D0%B2%201-1-720.webp 720w" sizes="(max-width:500px) 100vw, (max-width:900px) 50vw, 25vw"><img src="../content/watermarked/%D0%9B%D0%B2%201-1.jpg" width="720" height="1280" alt="Louis Vuitton Vanity PM Monogram Empreinte Black" fetchpriority="high"></picture></div></a><div class="card-caption"><a href="../products/louis-vuitton-7322.html" style="text-decoration:none;color:inherit;"><div class="name">Vanity PM Monogram Empreinte Black</div><div class="price">4200 грн</div><div class="code">7322</div></a><button class="add-to-cart" type="button" data-id="Лв-1">У кошик</button></div></div>
 <div class="card"><a href="../products/louis-vuitton-7478.html" style="display:block;text-decoration:none;color:inherit;"><div class="card-image"><picture><source type="image/webp" srcset="../content/optimized/%D0%9B%D0%B2%202-1-240.webp 240w, ../content/optimized/%D0%9B%D0%B2%202-1-480.webp 480w, ../content/optimized/%D0%9B%D0%B2%202-1-800.webp 800w, ../content/optimized/%D0%9B%D0%B2%202-1-960.webp 960w" sizes="(max-width:500px) 100vw, (max-width:900px) 50vw, 25vw"><img src="../content/watermarked/%D0%9B%D0%B2%202-1.jpg" width="960" height="1280" alt="Louis Vuitton Vanity PM Monogram Multicolor" loading="lazy" decoding="async"></picture></div></a><div class="card-caption"><a href="../products/louis-vuitton-7478.html" style="text-decoration:none;color:inherit;"><div class="name">Vanity PM Monogram Multicolor</div><div class="price">5600 грн</div><div class="code">7478</div></a><button class="add-to-cart" type="button" data-id="Лв-2">У кошик</button></div></div>
@@ -149,8 +169,38 @@
 <div class="card"><a href="../products/louis-vuitton-0745.html" style="display:block;text-decoration:none;color:inherit;"><div class="card-image"><picture><source type="image/webp" srcset="../content/optimized/%D0%9B%D0%B2%2013-1-240.webp 240w, ../content/optimized/%D0%9B%D0%B2%2013-1-480.webp 480w, ../content/optimized/%D0%9B%D0%B2%2013-1-800.webp 800w, ../content/optimized/%D0%9B%D0%B2%2013-1-960.webp 960w" sizes="(max-width:500px) 100vw, (max-width:900px) 50vw, 25vw"><img src="../content/watermarked/%D0%9B%D0%B2%2013-1.jpg" width="960" height="1280" alt="Louis Vuitton Keepall Bandouliere 25 Monogram Light Canvas" loading="lazy" decoding="async"></picture></div></a><div class="card-caption"><a href="../products/louis-vuitton-0745.html" style="text-decoration:none;color:inherit;"><div class="name">Keepall Bandouliere 25 Monogram Light Canvas</div><div class="price">5400 грн</div><div class="code">0745</div></a><button class="add-to-cart" type="button" data-id="Лв-13">У кошик</button></div></div>
 <div class="card"><a href="../products/louis-vuitton-0703.html" style="display:block;text-decoration:none;color:inherit;"><div class="card-image"><picture><source type="image/webp" srcset="../content/optimized/%D0%9B%D0%B2%2014-1-240.webp 240w, ../content/optimized/%D0%9B%D0%B2%2014-1-480.webp 480w, ../content/optimized/%D0%9B%D0%B2%2014-1-800.webp 800w, ../content/optimized/%D0%9B%D0%B2%2014-1-961.webp 961w" sizes="(max-width:500px) 100vw, (max-width:900px) 50vw, 25vw"><img src="../content/watermarked/%D0%9B%D0%B2%2014-1.jpg" width="961" height="1280" alt="Louis Vuitton Keepall 45 x Chrome Hearts Style" loading="lazy" decoding="async"></picture></div></a><div class="card-caption"><a href="../products/louis-vuitton-0703.html" style="text-decoration:none;color:inherit;"><div class="name">Keepall 45 x Chrome Hearts Style</div><div class="price">5100 грн</div><div class="code">0703</div></a><button class="add-to-cart" type="button" data-id="Лв-14">У кошик</button></div></div>
 <div class="card"><a href="../products/louis-vuitton-9156.html" style="display:block;text-decoration:none;color:inherit;"><div class="card-image"><picture><source type="image/webp" srcset="../content/optimized/%D0%9B%D0%B2%2015-5-240.webp 240w, ../content/optimized/%D0%9B%D0%B2%2015-5-480.webp 480w, ../content/optimized/%D0%9B%D0%B2%2015-5-800.webp 800w, ../content/optimized/%D0%9B%D0%B2%2015-5-900.webp 900w" sizes="(max-width:500px) 100vw, (max-width:900px) 50vw, 25vw"><img src="../content/watermarked/%D0%9B%D0%B2%2015-5.jpg" width="900" height="1600" alt="Louis Vuitton Speedy Soft 30 Dark" loading="lazy" decoding="async"></picture></div></a><div class="card-caption"><a href="../products/louis-vuitton-9156.html" style="text-decoration:none;color:inherit;"><div class="name">Speedy Soft 30 Dark</div><div class="price">6100 грн</div><div class="code">9156</div></a><button class="add-to-cart" type="button" data-id="Лв-15">У кошик</button></div></div>
+</div>
+<div class="dept-more"><a href="../category/sumky/louis-vuitton.html">Дивитись усі сумки Louis Vuitton</a></div>
+</section>
+<section class="dept-section" id="okuliary">
+<h2>Окуляри</h2>
+<div class="grid">
 <div class="card"><a href="../products/louis-vuitton-4398.html" style="display:block;text-decoration:none;color:inherit;"><div class="card-image"><picture><source type="image/webp" srcset="../content/optimized/%D0%9B%D0%B2%2016-2-240.webp 240w, ../content/optimized/%D0%9B%D0%B2%2016-2-480.webp 480w, ../content/optimized/%D0%9B%D0%B2%2016-2-800.webp 800w, ../content/optimized/%D0%9B%D0%B2%2016-2-900.webp 900w" sizes="(max-width:500px) 100vw, (max-width:900px) 50vw, 25vw"><img src="../content/watermarked/%D0%9B%D0%B2%2016-2.jpg" width="900" height="1600" alt="Louis Vuitton Окуляри" loading="lazy" decoding="async"></picture></div></a><div class="card-caption"><a href="../products/louis-vuitton-4398.html" style="text-decoration:none;color:inherit;"><div class="name">Окуляри</div><div class="price">3100 грн</div><div class="code">4398</div></a><button class="add-to-cart" type="button" data-id="Лв-16">У кошик</button></div></div>
 </div>
+<div class="dept-more"><a href="../category/okuliary/louis-vuitton.html">Дивитись усі окуляри Louis Vuitton</a></div>
+</section>
+<script>
+/* Перемикачі відділів на сторінці бренду. Без JS видно всі секції, а перемикачі — звичайні якорі. */
+(function () {
+    var bar = document.querySelector('.dept-filter');
+    if (!bar) return;
+    var links = bar.querySelectorAll('a'), secs = document.querySelectorAll('.dept-section');
+    function apply(f) {
+        for (var i = 0; i < links.length; i++) links[i].classList.toggle('active', links[i].getAttribute('data-filter') === f);
+        for (var j = 0; j < secs.length; j++) secs[j].hidden = !!f && secs[j].id !== f;
+    }
+    bar.addEventListener('click', function (e) {
+        var a = e.target.closest('a');
+        if (!a) return;
+        e.preventDefault();
+        var f = a.getAttribute('data-filter');
+        apply(f);
+        history.replaceState(null, '', f ? '#' + f : location.pathname + location.search);
+    });
+    var h = location.hash.slice(1);
+    if (h && document.getElementById(h) && bar.querySelector('[data-filter="' + h + '"]')) apply(h);
+})();
+</script>
 </div>
 
 <footer class="footer">
