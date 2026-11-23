@@ -126,6 +126,10 @@ var PRODUCTS = {
         images:["content/watermarked/Лв 15-5.jpg","content/watermarked/Лв 15-1.jpg","content/watermarked/Лв 15-2.jpg","content/watermarked/Лв 15-3.jpg","content/watermarked/Лв 15-4.jpg"], video:"content/watermarked/Лв 15-6.mp4", videos:["content/watermarked/Лв 15-6.mp4"],
         description:"Сумка Louis Vuitton Speedy Soft 30 Dark. Матеріал — шкіра. Розмір — 30/23. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         specs:{"Розмір":"30/23","Матеріал":"Шкіра","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+    "Лв-16": { dept:"eyewear", category:"Окуляри", brand:"Louis Vuitton", name:"Окуляри", price:"3100 грн", code:"4398",
+        images:["content/watermarked/Лв 16-2.jpg","content/watermarked/Лв 16-1.jpg","content/watermarked/Лв 16-3.jpg","content/watermarked/Лв 16-4.jpg"], video:"content/watermarked/Лв 16-5.mp4", videos:["content/watermarked/Лв 16-5.mp4"],
+        description:"Окуляри Louis Vuitton. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
     "Бл-1": { dept:"bags", category:"Сумки", brand:"Balenciaga", name:"Le City Suede Bag Chocolate Brown", price:"6800 грн", code:"3871",
         images:["content/watermarked/Бл 1-1.jpg","content/watermarked/Бл 1-2.jpg","content/watermarked/Бл 1-3.jpg"], video:"content/watermarked/Бл 1-4.mp4",
@@ -309,6 +313,14 @@ var PRODUCTS = {
         images:["content/watermarked/Ш 35-1.jpg","content/watermarked/Ш 35-2.jpg","content/watermarked/Ш 35-3.jpg","content/watermarked/Ш 35-4.jpg","content/watermarked/Ш 35-5.jpg"], video:"content/watermarked/Ш 35-6.mp4", videos:["content/watermarked/Ш 35-6.mp4"],
         description:"Сумка Chanel 22. Матеріал — шкіра. Розмір — 23/22. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         specs:{"Розмір":"23/22","Матеріал":"Шкіра","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+    "Ш-36": { dept:"eyewear", category:"Окуляри", brand:"Chanel", name:"Окуляри Chanel 4017-D", price:"3700 грн", code:"4390",
+        images:["content/watermarked/Ш 36-2.jpg","content/watermarked/Ш 36-1.jpg","content/watermarked/Ш 36-3.jpg","content/watermarked/Ш 36-4.jpg","content/watermarked/Ш 36-5.jpg"], video:"content/watermarked/Ш 36-6.mp4", videos:["content/watermarked/Ш 36-6.mp4"],
+        description:"Окуляри Chanel Chanel 4017-D. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+    "Ш-37": { dept:"eyewear", category:"Окуляри", brand:"Chanel", name:"Окуляри Chanel CH5565", price:"3600 грн", code:"4391",
+        images:["content/watermarked/Ш 37-4.jpg","content/watermarked/Ш 37-3.jpg","content/watermarked/Ш 37-1.jpg","content/watermarked/Ш 37-2.jpg","content/watermarked/Ш 37-5.jpg"], video:null,
+        description:"Окуляри Chanel. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
     "Д-1": { dept:"bags", category:"Сумки", brand:"Dior", name:"Saddle Bag Toile de Jouy Pink", price:"6200 грн", code:"6391",
         images:["content/watermarked/Д 1-1.jpg","content/watermarked/Д 1-2.jpg","content/watermarked/Д 1-3.jpg"], video:"content/watermarked/Д 1-4.mp4",
@@ -436,6 +448,14 @@ var PRODUCTS = {
         images:["content/watermarked/Мм 2-5.jpg","content/watermarked/Мм 2-1.jpg","content/watermarked/Мм 2-2.jpg","content/watermarked/Мм 2-3.jpg","content/watermarked/Мм 2-4.jpg"], video:"content/watermarked/Мм 2-6.mp4", videos:["content/watermarked/Мм 2-6.mp4"],
         description:"Сумка Miu Miu Beau Top-Handle. Матеріал — замша. Розмір — 35/25. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         specs:{"Розмір":"35/25","Матеріал":"Замша","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+    "Мм-3": { dept:"eyewear", category:"Окуляри", brand:"Miu Miu", name:"Окуляри Miu Miu MU 54YS", price:"3500 грн", code:"4377",
+        images:["content/watermarked/Мм 3-2.jpg","content/watermarked/Мм 3-1.jpg","content/watermarked/Мм 3-3.jpg","content/watermarked/Мм 3-4.jpg","content/watermarked/Мм 3-5.jpg"], video:"content/watermarked/Мм 3-6.mp4", videos:["content/watermarked/Мм 3-6.mp4"],
+        description:"Окуляри Miu Miu Miu Miu MU 54YS. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+    "Мм-4": { dept:"eyewear", category:"Окуляри", brand:"Miu Miu", name:"Окуляри Miu Miu MU 54YS", price:"3500 грн", code:"4378",
+        images:["content/watermarked/Мм 4-1.jpg","content/watermarked/Мм 4-2.jpg","content/watermarked/Мм 4-3.jpg"], video:"content/watermarked/Мм 4-4.mp4", videos:["content/watermarked/Мм 4-4.mp4"],
+        description:"Окуляри Miu Miu Miu Miu MU 54YS. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
     "Гч-1": { dept:"accessories", category:"Аксесуари", brand:"Gucci", name:"Двосторонній палантин/шарф", price:"2800 грн", code:"128",
         images:["content/watermarked/Гч 1-1.jpg","content/watermarked/Гч 1-2.jpg","content/watermarked/Гч 1-3.jpg","content/watermarked/Гч 1-4.jpg"], video:null,
@@ -457,6 +477,11 @@ var PRODUCTS = {
     "Тф-3": { dept:"eyewear", category:"Окуляри", brand:"Tom Ford", name:"Окуляри", price:"3500 грн", code:"4324",
         images:["content/watermarked/Тф 3-3.jpg","content/watermarked/Тф 3-1.jpg","content/watermarked/Тф 3-2.jpg","content/watermarked/Тф 3-4.jpg","content/watermarked/Тф 3-5.jpg","content/watermarked/Тф 3-6.jpg"], video:null,
         description:"Окуляри Tom Ford. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+
+    "Бг-1": { dept:"eyewear", category:"Окуляри", brand:"Bvlgari", name:"Окуляри Bvlgari Serpenti Forever", price:"3600 грн", code:"4376",
+        images:["content/watermarked/Бг 1-6.jpg","content/watermarked/Бг 1-1.jpg","content/watermarked/Бг 1-2.jpg","content/watermarked/Бг 1-3.jpg","content/watermarked/Бг 1-4.jpg","content/watermarked/Бг 1-5.jpg"], video:null,
+        description:"Окуляри Bvlgari Bvlgari Serpenti Forever. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
 };
