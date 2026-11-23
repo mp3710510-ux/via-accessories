@@ -345,7 +345,7 @@ var PRODUCTS = {
         description:"Ланцюжок. Сумка Chanel Trendy CC. Матеріал — шкіра. Розмір — 24/19/9. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         added:"2026-11-23",
         specs:{"Розмір":"24/19/9","Матеріал":"Шкіра","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
-    "Ш-30": { dept:"bags", category:"Сумки", brand:"Chanel", name:"Трохи нового контенту", price:"6400 грн", code:"98921",
+    "Ш-30": { dept:"bags", category:"Сумки", brand:"Chanel", name:"Chanel Urban Essentials Shopping Bag", price:"6400 грн", code:"98921",
         images:["content/watermarked/Ш 30-1.jpg","content/watermarked/Ш 30-2.jpg","content/watermarked/Ш 30-3.jpg","content/watermarked/Ш 30-4.jpg","content/watermarked/Ш 30-5.jpg"], video:"content/watermarked/Ш 30-6.mp4", videos:["content/watermarked/Ш 30-6.mp4"],
         description:"Сумка Chanel Трохи нового контенту. Матеріал — шкіра. Розмір — 30/17/10. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         added:"2026-11-23",
