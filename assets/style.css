@@ -732,3 +732,11 @@ html.order-open { overflow: hidden; }
 .search-fixed { font-size: 12px; letter-spacing: 1px; color: #6b6258; padding: 6px 10px 12px; }
 .search-fixed b { font-weight: 500; color: #1c1a17; }
 .search-status .search-fixed { padding: 4px 0 0; font-size: 13px; }
+
+/* «Всі бренди»: кількість товарів під назвою бренду */
+.brand-tile-count { text-align: center; padding-top: 6px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #a89c89; }
+/* бренд / відділ без товарів — «Скоро в наявності» */
+.coming-soon { max-width: 560px; margin: 10px auto 40px; padding: 50px 30px; text-align: center; color: #6b6258; border-top: 1px solid rgba(28,26,23,0.12); border-bottom: 1px solid rgba(28,26,23,0.12); }
+.coming-soon-title { font-family: 'Cormorant Garamond', serif; font-size: 32px; letter-spacing: 4px; text-transform: uppercase; color: #1c1a17; margin-bottom: 14px; }
+.coming-soon p { font-size: 14px; line-height: 1.7; }
+@media (max-width: 500px) { .coming-soon { padding: 40px 6px; } .coming-soon-title { font-size: 26px; letter-spacing: 3px; } }
