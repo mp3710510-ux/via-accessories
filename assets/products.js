@@ -122,6 +122,10 @@ var PRODUCTS = {
         images:["content/watermarked/Лв 14-1.jpg","content/watermarked/Лв 14-2.jpg","content/watermarked/Лв 14-3.jpg"], video:"content/watermarked/Лв 14-4.mp4",
         description:"Сумка Louis Vuitton Keepall 45 x Chrome Hearts Style. Матеріал — шкіра / канва. Комплект: пильник.",
         specs:{"Розмір":"45х26","Матеріал":"шкіра / канва","Комплект":"пильник"} },
+    "Лв-15": { dept:"bags", category:"Сумки", brand:"Louis Vuitton", name:"Speedy Soft 30 Dark", price:"6100 грн", code:"9156",
+        images:["content/watermarked/Лв 15-5.jpg","content/watermarked/Лв 15-1.jpg","content/watermarked/Лв 15-2.jpg","content/watermarked/Лв 15-3.jpg","content/watermarked/Лв 15-4.jpg"], video:"content/watermarked/Лв 15-6.mp4", videos:["content/watermarked/Лв 15-6.mp4"],
+        description:"Сумка Louis Vuitton Speedy Soft 30 Dark. Матеріал — шкіра. Розмір — 30/23. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        specs:{"Розмір":"30/23","Матеріал":"Шкіра","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
     "Бл-1": { dept:"bags", category:"Сумки", brand:"Balenciaga", name:"Le City Suede Bag Chocolate Brown", price:"6800 грн", code:"3871",
         images:["content/watermarked/Бл 1-1.jpg","content/watermarked/Бл 1-2.jpg","content/watermarked/Бл 1-3.jpg"], video:"content/watermarked/Бл 1-4.mp4",
