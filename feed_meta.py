@@ -75,7 +75,7 @@ _type(["кеди"], "кеди", "мн", CAT_SHOES)
 
 DEPT_DEFAULT = {
     "bags": ("сумка", "ж", CAT_HANDBAGS),
-    "shoes": ("взуття", "с", CAT_SHOES),
+    "shoes": ("кросівки", "мн", CAT_SHOES),        # тип у пості не вказано -> «Кросівки» («Взуття» — не тип товару)
     "jewelry": ("прикраса", "ж", CAT_JEWELRY),
     "watches": ("годинник", "ч", CAT_WATCHES),
     "eyewear": ("окуляри", "мн", CAT_SUNGLASSES),
