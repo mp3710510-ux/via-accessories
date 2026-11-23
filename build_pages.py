@@ -166,6 +166,41 @@ def esc(s):
     return html.escape(str(s), quote=True)
 
 
+# Контакти в тексті опису -> посилання (лише на сторінці товару; у products.js, feed.xml і JSON-LD текст не змінюється).
+# @username Telegram (5-32 символи, не частина e-mail) і українські номери: +38 073 862 41 36, +380738624136,
+# 380738624136, 073 862 41 36, (073) 862-41-36, 073-862-41-36, 0738624136.
+_CONTACT_RX = re.compile(
+    r"(?P<tg>(?<![\w@./])@[A-Za-z][A-Za-z0-9_]{4,31}(?![\w@]))"
+    r"|(?P<tel>(?<![\w+])(?:\+?38[\s\-]?)?\(?0\d{2}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}(?![\w]))")
+
+
+def _tel_href(raw):
+    d = re.sub(r"\D", "", raw)
+    if d.startswith("0") and len(d) == 10:
+        d = "38" + d
+    return "tel:+" + d if d.startswith("380") and len(d) == 12 else ""
+
+
+def linkify(text):
+    """Екранований текст опису, у якому @username і телефони - посилання (t.me / tel:)."""
+    text = str(text or "")
+    out, pos = [], 0
+    for m in _CONTACT_RX.finditer(text):
+        if m.group("tg"):
+            href = "https://t.me/" + m.group("tg")[1:]
+            link = '<a class="contact-link" href="%s" target="_blank" rel="noopener">%s</a>' % (esc(href), esc(m.group("tg")))
+        else:
+            href = _tel_href(m.group("tel"))
+            if not href:
+                continue
+            link = '<a class="contact-link" href="%s">%s</a>' % (esc(href), esc(m.group("tel")))
+        out.append(esc(text[pos:m.start()]))
+        out.append(link)
+        pos = m.end()
+    out.append(esc(text[pos:]))
+    return "".join(out)
+
+
 def url_path(rel):
     """Шлях до файлу з кирилицею/пробілами -> безпечний для URL (/ лишається)."""
     return urllib.parse.quote(rel, safe="/")
@@ -538,7 +573,7 @@ def long_desc_html(text):
     if not text:
         return ""
     paras = [x.strip() for x in re.split(r"\n\s*\n", text) if x.strip()]
-    body = "\n".join("<p>%s</p>" % "<br>".join(esc(l.strip()) for l in para.split("\n")) for para in paras)
+    body = "\n".join("<p>%s</p>" % "<br>".join(linkify(l.strip()) for l in para.split("\n")) for para in paras)
     return '<section class="long-desc"><div class="long-desc-inner">\n<h2>Опис</h2>\n%s\n</div></section>\n\n' % body
 
 
@@ -747,7 +782,7 @@ def build_page(tpl, pid, p, slug, depts, brand_pages, dept_pages, similar_html="
         "NAME": esc(name),
         "PRICE_BLOCK": price_block,
         "CODE": esc(code),
-        "DESCRIPTION_TEXT": esc(desc),
+        "DESCRIPTION_TEXT": linkify(desc),
         "SPECS": spec_items,
         "TG_HREF": esc(tg_href),
         "PRODUCT_JSON": product_json,
