@@ -156,6 +156,11 @@ var PRODUCTS = {
         description:"Опис зараз:\nЛанцюжок, сумка, карткотримач. Аксесуар Louis Vuitton Pochette Félicie. Матеріал — шкіра. Розмір — 21/13. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         added:"2026-11-25",
         specs:{"Розмір":"21/13","Матеріал":"Шкіра","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+    "Лв-19": { dept:"accessories", category:"Аксесуари", brand:"Louis Vuitton", name:"Двосторонній ремінь", price:"2900 грн", code:"978",
+        images:["content/watermarked/Лв 19-1.jpg","content/watermarked/Лв 19-2.jpg","content/watermarked/Лв 19-3.jpg","content/watermarked/Лв 19-4.jpg","content/watermarked/Лв 19-5.jpg"], video:"content/watermarked/Лв 19-6.mp4", videos:["content/watermarked/Лв 19-6.mp4"],
+        description:"Двосторонній ремінь. Ремінь Louis Vuitton Двосторонній. Матеріал — шкіра. Розмір — 1,5 см/75 см. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        added:"2026-11-25",
+        specs:{"Розмір":"1,5 см/75 см","Матеріал":"Шкіра","Фурнітура":"Уточнювати у менеджера"} },
 
     "Бл-1": { dept:"bags", category:"Сумки", brand:"Balenciaga", name:"Le City Suede Bag Chocolate Brown", price:"6800 грн", code:"3871",
         images:["content/watermarked/Бл 1-1.jpg","content/watermarked/Бл 1-2.jpg","content/watermarked/Бл 1-3.jpg"], video:"content/watermarked/Бл 1-4.mp4",
