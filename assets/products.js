@@ -166,6 +166,11 @@ var PRODUCTS = {
         description:"Сумка Louis Vuitton Capucines Mini. Матеріал — шкіра. Розмір — 20х15. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         added:"2026-11-25",
         specs:{"Розмір":"20х15","Матеріал":"Шкіра","Колір":"Cream","Фурнітура":"Уточнювати у менеджера"} },
+    "Лв-21": { dept:"bags", category:"Сумки", brand:"Louis Vuitton", name:"Nano Speedy Monogram Canvas", price:"5000 грн", code:"7044",
+        images:["content/watermarked/Лв 21-1.jpg"], video:null,
+        description:"Новинка. Сумка Louis Vuitton Nano Speedy Monogram. Матеріал — канва / шкіра. Розмір — 16х10х7,5. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        added:"2026-11-25",
+        specs:{"Розмір":"16х10х7,5","Матеріал":"Канва / шкіра","Фурнітура":"Уточнювати у менеджера"} },
 
     "Бл-1": { dept:"bags", category:"Сумки", brand:"Balenciaga", name:"Le City Suede Bag Chocolate Brown", price:"6800 грн", code:"3871",
         images:["content/watermarked/Бл 1-1.jpg","content/watermarked/Бл 1-2.jpg","content/watermarked/Бл 1-3.jpg"], video:"content/watermarked/Бл 1-4.mp4",
