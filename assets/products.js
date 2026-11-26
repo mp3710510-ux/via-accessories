@@ -615,6 +615,12 @@ var PRODUCTS = {
         added:"2026-11-23",
         specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
+    "Сл-2": { dept:"bags", category:"Сумки", brand:"Saint Laurent", name:"Sunset", price:"5200 грн", code:"5417",
+        images:["content/watermarked/Сл 2-1.jpg","content/watermarked/Сл 2-2.jpg","content/watermarked/Сл 2-3.jpg","content/watermarked/Сл 2-4.jpg","content/watermarked/Сл 2-5.jpg"], video:"content/watermarked/Сл 2-6.mp4", videos:["content/watermarked/Сл 2-6.mp4"],
+        description:"Є довгий ремішок. Сумка Saint Laurent Sunset. Матеріал — шкіра. Розмір — 22/12. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        added:"2026-11-26",
+        specs:{"Розмір":"22/12","Матеріал":"Шкіра","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+
 };
 
 /* ===== Допоміжні функції ===== */
