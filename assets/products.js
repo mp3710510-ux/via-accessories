@@ -508,6 +508,11 @@ var PRODUCTS = {
         description:"Плечовий ремішок, хустинка, замок, коник. Сумка Hermès. Матеріал — шкіра. Розмір — 30/25. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         added:"2026-11-26",
         specs:{"Розмір":"30/25","Матеріал":"Шкіра","Комплект":"Повний комплект","Фурнітура":"Срібна фурнітура"} },
+    "Н-8": { dept:"bags", category:"Сумки", brand:"Hermès", name:"Сумка", price:"6000 грн", code:"8338",
+        images:["content/watermarked/Н 8-1.jpg","content/watermarked/Н 8-2.jpg","content/watermarked/Н 8-3.jpg","content/watermarked/Н 8-4.jpg","content/watermarked/Н 8-5.jpg","content/watermarked/Н 8-6.jpg"], video:null,
+        description:"Плечовий ремішок, хустинка, замок, коник. Сумка Hermès. Матеріал — шкіра. Розмір — 30/25. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        added:"2026-11-26",
+        specs:{"Розмір":"30/25","Матеріал":"Шкіра","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
     "Лп-1": { dept:"bags", category:"Сумки", brand:"Loro Piana", name:"Extra Pocket 23 in Smooth Leather Chocolate Brown", price:"4700 грн", code:"3213",
         images:["content/watermarked/Лп 1-1.jpg","content/watermarked/Лп 1-2.jpg","content/watermarked/Лп 1-3.jpg"], video:"content/watermarked/Лп 1-4.mp4",
