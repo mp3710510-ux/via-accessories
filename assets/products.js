@@ -410,6 +410,11 @@ var PRODUCTS = {
         description:"Окуляри Chanel. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         added:"2026-11-23",
         specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+    "Ш-38": { dept:"bags", category:"Сумки", brand:"Chanel", name:"Classic Flap Bag Leather with Crystal", price:"5000 грн", code:"11435",
+        images:["content/watermarked/Ш 38-1.jpg","content/watermarked/Ш 38-2.jpg","content/watermarked/Ш 38-3.jpg","content/watermarked/Ш 38-4.jpg"], video:null,
+        description:"Сумка Chanel Classic Flap Crystal. Матеріал — шкіра. Розмір — 19 см. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        added:"2026-11-26",
+        specs:{"Розмір":"19 см","Матеріал":"Шкіра","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
     "Д-1": { dept:"bags", category:"Сумки", brand:"Dior", name:"Saddle Bag Toile de Jouy Pink", price:"6200 грн", code:"6391",
         images:["content/watermarked/Д 1-1.jpg","content/watermarked/Д 1-2.jpg","content/watermarked/Д 1-3.jpg"], video:"content/watermarked/Д 1-4.mp4",
