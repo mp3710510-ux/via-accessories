@@ -466,6 +466,11 @@ var PRODUCTS = {
         description:"2 чашки та 2 блюдце Коробка як на фото. Аксесуар Dior Сервіз. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
         added:"2026-11-26",
         specs:{"Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+    "Д-10": { dept:"accessories", category:"Аксесуари", brand:"Dior", name:"Шикарний платок Dior", price:"2800 грн", code:"P0026",
+        images:["content/watermarked/Д 10-1.jpg","content/watermarked/Д 10-2.jpg","content/watermarked/Д 10-3.jpg","content/watermarked/Д 10-4.jpg"], video:null,
+        description:"Шикарний платок Dior. Аксесуар Dior Шикарний платок Dior. Матеріал — шовк та кашемір. Розмір — 130/130. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        added:"2026-11-28",
+        specs:{"Розмір":"130/130","Матеріал":"Шовк та кашемір","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
     "Дг-1": { dept:"bags", category:"Сумки", brand:"Dolce & Gabbana", name:"Mini Sicily Green Patent Leather", price:"4500 грн", code:"92261",
         images:["content/watermarked/Дг 1-1.jpg","content/watermarked/Дг 1-2.jpg","content/watermarked/Дг 1-3.jpg"], video:"content/watermarked/Дг 1-4.mp4",
