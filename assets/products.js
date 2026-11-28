@@ -672,6 +672,12 @@ var PRODUCTS = {
         added:"2026-11-28",
         specs:{"Розмір":"25 мм","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
 
+    "Кр-1": { dept:"watches", category:"Годинники", brand:"Cartier", name:"Годинник", price:"5500 грн", code:"9199",
+        images:["content/watermarked/Кр 1-1.jpg","content/watermarked/Кр 1-2.jpg","content/watermarked/Кр 1-3.jpg","content/watermarked/Кр 1-4.jpg","content/watermarked/Кр 1-5.jpg"], video:"content/watermarked/Кр 1-6.mp4", videos:["content/watermarked/Кр 1-6.mp4"],
+        description:"Годинник Cartier. Розмір — 23/23 мм. У комплекті — фірмове пакування. Кожна позиція проходить перевірку якості перед відправкою. Доставка по Україні та Європі. Якщо є питання або потрібно щось уточнити — пишіть у Telegram @via_manager або телефонуйте +38 073 862 41 36.",
+        added:"2026-11-28",
+        specs:{"Розмір":"23/23 мм","Комплект":"Повний комплект","Фурнітура":"Уточнювати у менеджера"} },
+
 };
 
 /* ===== Допоміжні функції ===== */
